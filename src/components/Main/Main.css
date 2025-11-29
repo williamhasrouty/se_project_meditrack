@@ -1,0 +1,14 @@
+.main {
+  flex: 1;
+  min-height: calc(100vh - 200px);
+  padding: 48px 24px;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding: 32px 16px;
+  }
+}

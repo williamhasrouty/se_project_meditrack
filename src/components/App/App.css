@@ -1,0 +1,79 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9fafb;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+.app__welcome {
+  text-align: center;
+  padding: 48px 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.app__welcome h1 {
+  font-size: 36px;
+  color: #1f2937;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #2563eb, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app__description {
+  font-size: 18px;
+  color: #6b7280;
+  line-height: 1.8;
+  margin-bottom: 32px;
+}
+
+.app__cta {
+  margin-top: 48px;
+}
+
+.app__button {
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.app__button_primary {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: #ffffff;
+}
+
+.app__button_primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.app__button_primary:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .app__welcome {
+    padding: 32px 16px;
+  }
+
+  .app__welcome h1 {
+    font-size: 30px;
+  }
+
+  .app__description {
+    font-size: 16px;
+  }
+
+  .app__button {
+    width: 100%;
+    padding: 16px 24px;
+  }
+}

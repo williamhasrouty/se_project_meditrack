@@ -1,0 +1,87 @@
+.navigation {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+.navigation__links {
+  display: flex;
+  gap: 24px;
+  margin-right: 32px;
+}
+
+.navigation__link {
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 150ms ease-in-out;
+}
+
+.navigation__link:hover {
+  color: #2563eb;
+  background-color: #f3f4f6;
+}
+
+.navigation__link_active {
+  color: #2563eb;
+  background-color: #f3f4f6;
+}
+
+.navigation__button {
+  padding: 8px 24px;
+  border: 2px solid #2563eb;
+  background: transparent;
+  color: #2563eb;
+  border-radius: 9999px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 200ms ease-in-out;
+}
+
+.navigation__button:hover {
+  background-color: #2563eb;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.navigation__button_type_signup {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: #ffffff;
+  border: none;
+}
+
+.navigation__button_type_signup:hover {
+  background: linear-gradient(135deg, #1e40af, #2563eb);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.navigation__button_logout {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.navigation__button_logout:hover {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .navigation__links {
+    display: none;
+  }
+
+  .navigation {
+    gap: 8px;
+  }
+
+  .navigation__button {
+    padding: 4px 16px;
+    font-size: 12px;
+  }
+}
