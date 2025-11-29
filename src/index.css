@@ -1,0 +1,25 @@
+@import url(./vendor/normalize.css);
+@import url(./vendor/fonts.css);
+
+.page {
+  background-color: #f3f3f3;
+  font-family: "Inter", Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page__content {
+  flex: 1;
+  width: 1360px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+@media screen and (max-width: 627px) {
+  .page__content {
+    padding: 18px 16px;
+  }
+}
