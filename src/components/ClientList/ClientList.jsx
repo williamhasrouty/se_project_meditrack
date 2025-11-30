@@ -1,7 +1,16 @@
 import "./ClientList.css";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import Preloader from "../Preloader/Preloader";
 
-function ClientList({ clients }) {
+function ClientList({ clients, isLoading, error }) {
+  const [visibleCount, setVisibleCount] = useState(3);
+
+  // Reset visible count when clients change
+  useEffect(() => {
+    setVisibleCount(3);
+  }, [clients]);
+
   const getInitials = (name) => {
     const nameParts = name.trim().split(" ");
     if (nameParts.length >= 2) {
@@ -17,11 +26,42 @@ function ClientList({ clients }) {
     return name.charAt(0).toUpperCase() + name.charAt(1).toLowerCase();
   };
 
+  const handleShowMore = () => {
+    setVisibleCount((prev) => prev + 3);
+  };
+
+  const visibleClients = clients.slice(0, visibleCount);
+  const hasMore = visibleCount < clients.length;
+
+  if (isLoading) {
+    return (
+      <section className="client-list">
+        <Preloader />
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="client-list">
+        <p className="client-list__error">{error}</p>
+      </section>
+    );
+  }
+
+  if (clients.length === 0) {
+    return (
+      <section className="client-list">
+        <p className="client-list__empty">Nothing found</p>
+      </section>
+    );
+  }
+
   return (
     <section className="client-list">
       <h2 className="client-list__title">Your Clients</h2>
       <ul className="client-list__items">
-        {clients.map((client) => (
+        {visibleClients.map((client) => (
           <li key={client._id} className="client-list__card">
             <Link to={`/client/${client._id}`} className="client-list__link">
               <div className="client-list__avatar">
@@ -32,6 +72,11 @@ function ClientList({ clients }) {
           </li>
         ))}
       </ul>
+      {hasMore && (
+        <button className="client-list__show-more" onClick={handleShowMore}>
+          Show more
+        </button>
+      )}
     </section>
   );
 }

@@ -71,7 +71,13 @@ function EditProfileModal({ isOpen, onClose, onUpdateUser, currentUser }) {
         required
         minLength={1}
         maxLength={3}
+        disabled={currentUser?.initials}
       />
+      {currentUser?.initials && (
+        <p className="edit-profile-form__info">
+          Initials cannot be changed once chosen
+        </p>
+      )}
       <label htmlFor="edit-profile-avatar" className="edit-profile-form__label">
         Avatar URL
       </label>

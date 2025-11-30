@@ -14,7 +14,7 @@ import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import CurrentUserContext from "../../contexts/CurrentUserContext";
 import { signup, signin, getUser } from "../../utils/auth";
 import updateUser from "../../utils/updateUser";
-import { defaultClients } from "../../utils/constants";
+import { getClients } from "../../utils/api";
 
 function App() {
   const navigate = useNavigate();
@@ -24,14 +24,40 @@ function App() {
   const [token, setToken] = useState(null);
   const [loginError, setLoginError] = useState("");
   const [registerError, setRegisterError] = useState("");
-  const [clients] = useState(defaultClients);
+  const [clients, setClients] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [dataError, setDataError] = useState("");
 
-  // Set isLoggedIn based on currentUser (like se_project_react)
+  // Set isLoggedIn based on currentUser
   useEffect(() => {
     setIsLoggedIn(!!currentUser);
   }, [currentUser]);
 
-  // Check token on app mount (like se_project_react)
+  // Load clients when user logs in
+  useEffect(() => {
+    if (isLoggedIn && token) {
+      setIsLoading(true);
+      setDataError("");
+      getClients(token)
+        .then((data) => {
+          setClients(data);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error("Failed to load clients:", err);
+          setDataError(
+            "Sorry, something went wrong during the request. There may be a connection issue or the server may be down. Please try again later."
+          );
+          setIsLoading(false);
+        });
+    } else {
+      setClients([]);
+      setIsLoading(false);
+      setDataError("");
+    }
+  }, [isLoggedIn, token]);
+
+  // Check token on app mount
   useEffect(() => {
     const stored = localStorage.getItem("jwt");
     if (stored) {
@@ -66,7 +92,7 @@ function App() {
     setRegisterError("");
   };
 
-  // Sign out logic (like se_project_react)
+  // Sign out logic
   const handleLogout = () => {
     localStorage.removeItem("jwt");
     setCurrentUser(null);
@@ -160,6 +186,7 @@ function App() {
           onLoginClick={handleLoginClick}
           onRegisterClick={handleRegisterClick}
           onLogout={handleLogout}
+          currentUser={currentUser}
         />
         <Main>
           <Routes>
@@ -167,7 +194,11 @@ function App() {
               path="/"
               element={
                 isLoggedIn ? (
-                  <ClientList clients={clients} />
+                  <ClientList
+                    clients={clients}
+                    isLoading={isLoading}
+                    error={dataError}
+                  />
                 ) : (
                   <div className="app__welcome">
                     <h1>Welcome to MediTrack</h1>
@@ -189,7 +220,16 @@ function App() {
               }
             />
             <Route path="/medications" element={<MedicationLog />} />
-            <Route path="/clients" element={<ClientList clients={clients} />} />
+            <Route
+              path="/clients"
+              element={
+                <ClientList
+                  clients={clients}
+                  isLoading={isLoading}
+                  error={dataError}
+                />
+              }
+            />
             <Route
               path="/client/:clientId"
               element={

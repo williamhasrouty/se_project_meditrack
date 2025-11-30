@@ -1,7 +1,13 @@
 import "./Navigation.css";
 import { NavLink, useLocation } from "react-router-dom";
 
-function Navigation({ isLoggedIn, onLoginClick, onRegisterClick, onLogout }) {
+function Navigation({
+  isLoggedIn,
+  onLoginClick,
+  onRegisterClick,
+  onLogout,
+  currentUser,
+}) {
   const location = useLocation();
   const isProfilePage = location.pathname === "/profile";
 
@@ -15,7 +21,7 @@ function Navigation({ isLoggedIn, onLoginClick, onRegisterClick, onLogout }) {
               `navigation__link ${isActive ? "navigation__link_active" : ""}`
             }
           >
-            {isProfilePage ? "Clients" : "Profile"}
+            {isProfilePage ? "Clients" : currentUser?.name || "My Profile"}
           </NavLink>
           <button
             className="navigation__button navigation__button_logout"
