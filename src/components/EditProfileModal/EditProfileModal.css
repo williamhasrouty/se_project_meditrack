@@ -31,3 +31,19 @@
   color: #9ca3af;
   font-size: 15px;
 }
+
+.edit-profile-form__input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  border-bottom-color: #d1d5db;
+  color: #6b7280;
+}
+
+.edit-profile-form__info {
+  font-size: 13px;
+  line-height: 18px;
+  color: #6b7280;
+  margin-top: -20px;
+  margin-bottom: 24px;
+  font-style: italic;
+}
