@@ -1,16 +1,30 @@
 import "./RegisterModal.css";
+import { useEffect } from "react";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
+import { useForm } from "../../utils/hooks/useForm";
 
-function RegisterModal({ isOpen, onClose, onRegister, onLoginClick }) {
+function RegisterModal({
+  isOpen,
+  onClose,
+  onRegister,
+  onLoginClick,
+  errorMessage,
+}) {
+  const { values, handleChange, setValues } = useForm({
+    email: "",
+    password: "",
+    name: "",
+  });
+
+  useEffect(() => {
+    if (isOpen) {
+      setValues({ email: "", password: "", name: "" });
+    }
+  }, [isOpen, setValues]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    const userData = {
-      name: formData.get("name"),
-      email: formData.get("email"),
-      password: formData.get("password"),
-    };
-    onRegister(userData);
+    onRegister(values);
   };
 
   return (
@@ -30,6 +44,8 @@ function RegisterModal({ isOpen, onClose, onRegister, onLoginClick }) {
         type="email"
         placeholder="Email*"
         className="register-form__input"
+        value={values.email}
+        onChange={handleChange}
         required
       />
 
@@ -42,6 +58,8 @@ function RegisterModal({ isOpen, onClose, onRegister, onLoginClick }) {
         type="password"
         placeholder="Password*"
         className="register-form__input"
+        value={values.password}
+        onChange={handleChange}
         required
       />
 
@@ -54,8 +72,12 @@ function RegisterModal({ isOpen, onClose, onRegister, onLoginClick }) {
         type="text"
         placeholder="Name*"
         className="register-form__input"
+        value={values.name}
+        onChange={handleChange}
         required
       />
+
+      {errorMessage && <p className="register-form__error">{errorMessage}</p>}
 
       <div className="register-modal__button-row">
         <button

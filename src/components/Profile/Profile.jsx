@@ -1,7 +1,10 @@
 import "./Profile.css";
+import { useContext } from "react";
 import SideBar from "./SideBar/SideBar";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
 
-function Profile({ onEditProfile, onLogout, currentUser }) {
+function Profile({ onEditProfile, onLogout }) {
+  const currentUser = useContext(CurrentUserContext);
   return (
     <div className="profile">
       <section className="profile__sidebar">

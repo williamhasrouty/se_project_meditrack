@@ -27,7 +27,8 @@
   background: linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%);
   color: white;
   font-weight: 700;
-  font-size: 28px;
+  font-size: 20px;
+  letter-spacing: 0.5px;
 }
 
 .sidebar__top {
@@ -90,7 +91,7 @@
   .sidebar__avatar {
     width: 56px;
     height: 56px;
-    font-size: 24px;
+    font-size: 18px;
   }
 
   .sidebar__username {
