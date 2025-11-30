@@ -1,6 +1,21 @@
 import "./SideBar.css";
 
 function SideBar({ onEditProfile, onLogout, currentUser }) {
+  const getInitials = (name) => {
+    const nameParts = name.trim().split(" ");
+    if (nameParts.length >= 2) {
+      const firstName = nameParts[0];
+      const lastName = nameParts[nameParts.length - 1];
+      return (
+        firstName.charAt(0).toUpperCase() +
+        firstName.charAt(1).toLowerCase() +
+        lastName.charAt(0).toUpperCase() +
+        lastName.charAt(1).toLowerCase()
+      );
+    }
+    return name.charAt(0).toUpperCase() + name.charAt(1).toLowerCase();
+  };
+
   const renderAvatar = () => {
     if (currentUser && currentUser.avatar) {
       return (
@@ -13,12 +28,12 @@ function SideBar({ onEditProfile, onLogout, currentUser }) {
     } else if (currentUser && currentUser.name) {
       return (
         <div className="sidebar__avatar sidebar__avatar_placeholder">
-          {currentUser.name.charAt(0).toUpperCase()}
+          {getInitials(currentUser.name)}
         </div>
       );
     } else {
       return (
-        <div className="sidebar__avatar sidebar__avatar_placeholder">S</div>
+        <div className="sidebar__avatar sidebar__avatar_placeholder">ST</div>
       );
     }
   };

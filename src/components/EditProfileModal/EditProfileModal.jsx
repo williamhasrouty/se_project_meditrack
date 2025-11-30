@@ -1,23 +1,33 @@
 import "./EditProfileModal.css";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
+import { useForm } from "../../utils/hooks/useForm";
 
 function EditProfileModal({ isOpen, onClose, onUpdateUser, currentUser }) {
-  const [name, setName] = useState("");
-  const [avatar, setAvatar] = useState("");
-  const [initials, setInitials] = useState("");
+  const { values, handleChange, setValues } = useForm({
+    name: "",
+    avatar: "",
+    initials: "",
+  });
 
   useEffect(() => {
     if (isOpen && currentUser) {
-      setName(currentUser.name || "");
-      setAvatar(currentUser.avatar || "");
-      setInitials(currentUser.initials || "");
+      setValues({
+        name: currentUser.name || "",
+        avatar: currentUser.avatar || "",
+        initials: currentUser.initials || "",
+      });
     }
-  }, [isOpen, currentUser]);
+  }, [isOpen, currentUser, setValues]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onUpdateUser({ name, avatar, initials });
+    onUpdateUser(values);
+  };
+
+  const handleInitialsChange = (e) => {
+    const { name, value } = e.target;
+    setValues({ ...values, [name]: value.toUpperCase() });
   };
 
   return (
@@ -38,8 +48,8 @@ function EditProfileModal({ isOpen, onClose, onUpdateUser, currentUser }) {
         type="text"
         placeholder="Enter your name"
         className="edit-profile-form__input"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        value={values.name}
+        onChange={handleChange}
         required
         minLength={2}
         maxLength={30}
@@ -56,8 +66,8 @@ function EditProfileModal({ isOpen, onClose, onUpdateUser, currentUser }) {
         type="text"
         placeholder="Enter your initials (e.g., JD)"
         className="edit-profile-form__input"
-        value={initials}
-        onChange={(e) => setInitials(e.target.value.toUpperCase())}
+        value={values.initials}
+        onChange={handleInitialsChange}
         required
         minLength={1}
         maxLength={3}
@@ -71,8 +81,8 @@ function EditProfileModal({ isOpen, onClose, onUpdateUser, currentUser }) {
         type="url"
         placeholder="Enter avatar URL"
         className="edit-profile-form__input"
-        value={avatar}
-        onChange={(e) => setAvatar(e.target.value)}
+        value={values.avatar}
+        onChange={handleChange}
       />
     </ModalWithForm>
   );
