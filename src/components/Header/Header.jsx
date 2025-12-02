@@ -21,15 +21,18 @@ function Header({
   }, []);
 
   const formatDateTime = () => {
-    return currentDateTime.toLocaleString("en-US", {
+    const dateStr = currentDateTime.toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
       day: "numeric",
       year: "numeric",
+    });
+    const timeStr = currentDateTime.toLocaleTimeString("en-US", {
       hour: "numeric",
       minute: "2-digit",
       hour12: true,
     });
+    return `${dateStr}, ${timeStr}`;
   };
 
   return (
