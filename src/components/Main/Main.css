@@ -9,6 +9,19 @@
 
 @media (max-width: 768px) {
   .main {
-    padding: 32px 16px;
+    padding: 24px 16px;
+    min-height: calc(100vh - 150px);
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 20px 12px;
+  }
+}
+
+@media (max-width: 320px) {
+  .main {
+    padding: 16px 8px;
   }
 }
