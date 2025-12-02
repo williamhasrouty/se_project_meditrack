@@ -27,14 +27,12 @@ function SideBar({ onEditProfile, onLogout, currentUser }) {
       );
     } else if (currentUser && currentUser.name) {
       return (
-        <div className="sidebar__avatar sidebar__avatar_placeholder">
+        <div className="sidebar__avatar-placeholder">
           {getInitials(currentUser.name)}
         </div>
       );
     } else {
-      return (
-        <div className="sidebar__avatar sidebar__avatar_placeholder">ST</div>
-      );
+      return <div className="sidebar__avatar-placeholder">ST</div>;
     }
   };
 

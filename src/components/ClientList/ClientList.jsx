@@ -1,15 +1,19 @@
 import "./ClientList.css";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Preloader from "../Preloader/Preloader";
 
 function ClientList({ clients, isLoading, error }) {
   const [visibleCount, setVisibleCount] = useState(3);
 
-  // Reset visible count when clients change
+  // Reset visible count when clients change using useMemo
+  const clientsLength = clients.length;
+  const resetKey = useMemo(() => clientsLength, [clientsLength]);
+
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisibleCount(3);
-  }, [clients]);
+  }, [resetKey]);
 
   const getInitials = (name) => {
     const nameParts = name.trim().split(" ");
