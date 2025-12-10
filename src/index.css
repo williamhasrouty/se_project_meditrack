@@ -1,25 +1,45 @@
 @import url(./vendor/normalize.css);
 @import url(./vendor/fonts.css);
 
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  max-width: 100vw;
+  overflow-x: auto;
+}
+
 .page {
   background-color: #f3f3f3;
   font-family: "Inter", Arial, sans-serif;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  max-width: 100%;
 }
 
 .page__content {
   flex: 1;
-  width: 1360px;
+  width: 100%;
+  max-width: 1360px;
   margin: 0 auto;
   padding: 0 20px;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
-@media screen and (max-width: 627px) {
+@media screen and (max-width: 768px) {
   .page__content {
     padding: 18px 16px;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .page__content {
+    padding: 12px 8px;
   }
 }

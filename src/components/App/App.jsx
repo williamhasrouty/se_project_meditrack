@@ -19,7 +19,6 @@ import { getClients } from "../../utils/api";
 function App() {
   const navigate = useNavigate();
   const [activeModal, setActiveModal] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loginError, setLoginError] = useState("");
@@ -28,14 +27,13 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [dataError, setDataError] = useState("");
 
-  // Set isLoggedIn based on currentUser
-  useEffect(() => {
-    setIsLoggedIn(!!currentUser);
-  }, [currentUser]);
+  // Derive isLoggedIn from currentUser instead of using useEffect
+  const isLoggedInDerived = !!currentUser;
 
   // Load clients when user logs in
   useEffect(() => {
-    if (isLoggedIn && token) {
+    if (isLoggedInDerived && token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsLoading(true);
       setDataError("");
       getClients(token)
@@ -50,12 +48,12 @@ function App() {
           );
           setIsLoading(false);
         });
-    } else {
+    } else if (!isLoggedInDerived) {
       setClients([]);
       setIsLoading(false);
       setDataError("");
     }
-  }, [isLoggedIn, token]);
+  }, [isLoggedInDerived, token]);
 
   // Check token on app mount
   useEffect(() => {
@@ -72,9 +70,6 @@ function App() {
           setCurrentUser(null);
           setToken(null);
         });
-    } else {
-      setCurrentUser(null);
-      setToken(null);
     }
   }, []);
 
@@ -97,7 +92,6 @@ function App() {
     localStorage.removeItem("jwt");
     setCurrentUser(null);
     setToken(null);
-    setIsLoggedIn(false);
     navigate("/");
   };
 
@@ -182,7 +176,7 @@ function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="app">
         <Header
-          isLoggedIn={isLoggedIn}
+          isLoggedIn={isLoggedInDerived}
           onLoginClick={handleLoginClick}
           onRegisterClick={handleRegisterClick}
           onLogout={handleLogout}
@@ -193,7 +187,7 @@ function App() {
             <Route
               path="/"
               element={
-                isLoggedIn ? (
+                isLoggedInDerived ? (
                   <ClientList
                     clients={clients}
                     isLoading={isLoading}
@@ -233,7 +227,7 @@ function App() {
             <Route
               path="/client/:clientId"
               element={
-                <ProtectedRoute isLoggedIn={isLoggedIn}>
+                <ProtectedRoute isLoggedIn={isLoggedInDerived}>
                   <MedicationLog clients={clients} currentUser={currentUser} />
                 </ProtectedRoute>
               }
@@ -241,10 +235,11 @@ function App() {
             <Route
               path="/profile"
               element={
-                <ProtectedRoute isLoggedIn={isLoggedIn}>
+                <ProtectedRoute isLoggedIn={isLoggedInDerived}>
                   <Profile
                     onEditProfile={handleEditProfile}
                     onLogout={handleLogout}
+                    clients={clients}
                   />
                 </ProtectedRoute>
               }

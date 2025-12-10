@@ -113,30 +113,35 @@
   border: 1px solid #e5e7eb;
 }
 
-.medication-log__td_medication {
+.medication-log__medication-cell {
   text-align: left;
+  padding: 6px 2px;
   padding-left: 8px;
   font-weight: 600;
   color: #1f2937;
   background-color: #f9fafb;
   font-size: 12px;
+  border: 1px solid #e5e7eb;
 }
 
-.medication-log__td_medication_clickable {
+.medication-log__medication-cell_clickable {
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.medication-log__td_medication_clickable:hover {
+.medication-log__medication-cell_clickable:hover {
   color: #2563eb;
   text-decoration: underline;
 }
 
-.medication-log__td_time {
+.medication-log__time-cell {
+  padding: 6px 2px;
   font-weight: 500;
   color: #6b7280;
   background-color: #f9fafb;
   font-size: 11px;
+  border: 1px solid #e5e7eb;
+  text-align: center;
 }
 
 .medication-log__td_cell {
@@ -274,15 +279,54 @@
 
 @media screen and (max-width: 768px) {
   .medication-log {
-    padding: 16px;
+    padding: 12px;
   }
 
   .medication-log__title {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .medication-log__subtitle {
-    font-size: 16px;
+    font-size: 14px;
+  }
+
+  .medication-log__back-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .medication-log__table-container {
+    max-width: 100%;
+  }
+
+  .medication-log__table {
+    min-width: 800px;
+  }
+
+  .medication-log__th {
+    font-size: 10px;
+    padding: 4px 2px;
+  }
+
+  .medication-log__th_medication {
+    min-width: 100px;
+  }
+
+  .medication-log__td {
+    font-size: 10px;
+    padding: 4px 1px;
+  }
+
+  .medication-log__medication-cell {
+    font-size: 11px;
+  }
+
+  .medication-log__footer {
+    padding: 12px;
+  }
+
+  .medication-log__instructions {
+    font-size: 12px;
   }
 
   .medication-modal__content {
@@ -292,5 +336,93 @@
 
   .medication-modal__title {
     font-size: 22px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .medication-log {
+    padding: 8px;
+  }
+
+  .medication-log__title {
+    font-size: 18px;
+  }
+
+  .medication-log__subtitle {
+    font-size: 12px;
+  }
+
+  .medication-log__back-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .medication-log__table {
+    min-width: 700px;
+  }
+
+  .medication-log__th {
+    font-size: 9px;
+    padding: 3px 1px;
+  }
+
+  .medication-log__td {
+    font-size: 9px;
+    padding: 3px 1px;
+  }
+
+  .medication-log__instructions {
+    font-size: 11px;
+  }
+
+  .medication-modal__content {
+    padding: 20px;
+  }
+
+  .medication-modal__title {
+    font-size: 20px;
+  }
+
+  .medication-modal__text {
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .medication-log {
+    padding: 4px;
+  }
+
+  .medication-log__title {
+    font-size: 16px;
+  }
+
+  .medication-log__subtitle {
+    font-size: 11px;
+  }
+
+  .medication-log__back-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .medication-log__table {
+    min-width: 600px;
+  }
+
+  .medication-log__footer {
+    padding: 8px;
+  }
+
+  .medication-log__instructions {
+    font-size: 10px;
+  }
+
+  .medication-modal__content {
+    padding: 16px;
+  }
+
+  .medication-modal__title {
+    font-size: 18px;
   }
 }

@@ -38,8 +38,6 @@ function MedicationLog({ clients, currentUser }) {
     );
   }
 
-  const times = ["AM", "Noon", "PM", "Bedtime"];
-
   const handleCellClick = (medicationId, day, time) => {
     const key = `${medicationId}-${day}-${time}`;
     const userInitials =
@@ -152,16 +150,14 @@ function MedicationLog({ clients, currentUser }) {
                 >
                   {timeIndex === 0 && (
                     <td
-                      className="medication-log__td medication-log__td_medication medication-log__td_medication_clickable"
+                      className="medication-log__medication-cell medication-log__medication-cell_clickable"
                       rowSpan={medication.times.length}
                       onClick={() => handleMedicationClick(medication)}
                     >
                       {medication.name}
                     </td>
                   )}
-                  <td className="medication-log__td medication-log__td_time">
-                    {time}
-                  </td>
+                  <td className="medication-log__time-cell">{time}</td>
                   {Array.from({ length: daysInMonth }, (_, i) => {
                     const day = i + 1;
                     const key = `${medication.id}-${day}-${time}`;

@@ -1,5 +1,6 @@
 import "./Header.css";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Navigation from "../Navigation/Navigation";
 
 function Header({
@@ -9,11 +10,39 @@ function Header({
   onLogout,
   currentUser,
 }) {
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatDateTime = () => {
+    const dateStr = currentDateTime.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+    const timeStr = currentDateTime.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+    return `${dateStr}, ${timeStr}`;
+  };
+
   return (
     <header className="header">
-      <Link to="/" className="header__logo">
-        MediTrack
-      </Link>
+      <div className="header__left">
+        <Link to="/" className="header__logo">
+          MediTrack
+        </Link>
+        <span className="header__datetime">{formatDateTime()}</span>
+      </div>
       <Navigation
         isLoggedIn={isLoggedIn}
         onLoginClick={onLoginClick}

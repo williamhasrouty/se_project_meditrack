@@ -104,13 +104,22 @@
 }
 
 @media screen and (max-width: 768px) {
-  .client-list__items {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 16px;
+  .client-list {
+    padding: 16px;
   }
 
-  .client-list__card {
-    padding: 20px;
+  .client-list__title {
+    font-size: 24px;
+    margin: 0 0 24px;
+  }
+
+  .client-list__items {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .client-list__link {
+    padding: 16px;
   }
 
   .client-list__avatar {
@@ -120,6 +129,62 @@
   }
 
   .client-list__name {
+    font-size: 16px;
+  }
+
+  .client-list__show-more {
+    padding: 10px 24px;
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .client-list {
+    padding: 12px;
+  }
+
+  .client-list__title {
+    font-size: 20px;
+  }
+
+  .client-list__items {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+  }
+
+  .client-list__link {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .client-list__avatar {
+    width: 50px;
+    height: 50px;
+    font-size: 14px;
+  }
+
+  .client-list__name {
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .client-list {
+    padding: 8px;
+  }
+
+  .client-list__title {
     font-size: 18px;
+    margin: 0 0 16px;
+  }
+
+  .client-list__items {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .client-list__show-more {
+    padding: 8px 20px;
+    font-size: 13px;
   }
 }

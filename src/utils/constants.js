@@ -37,7 +37,9 @@ export const defaultClients = [
 ];
 
 // Base URL for API (will be used when backend is implemented)
+/* eslint-disable no-undef */
 export const BASE_URL =
   process.env.NODE_ENV === "production"
     ? "https://api.meditrack.com"
     : "http://localhost:3001";
+/* eslint-enable no-undef */

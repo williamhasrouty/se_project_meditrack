@@ -2,6 +2,10 @@
 
 A comprehensive medication tracking system for healthcare professionals to manage client medications, track administration, and maintain accurate records.
 
+## Live Demo
+
+🔗 https://williamhasrouty.github.io/se_project_meditrack
+
 ## Overview
 
 MediTrack is a React-based web application designed for healthcare staff to efficiently manage their clients' medication schedules and track daily administration. The application provides an intuitive interface for viewing client profiles, recording medication administration with staff initials, and accessing detailed medication information via the OpenFDA API.
@@ -40,5 +44,4 @@ MediTrack is a React-based web application designed for healthcare staff to effi
 ### APIs
 
 - OpenFDA Drug Label API: Third-party medication information
-- Simulated backend API using localStorage 
-
+- Simulated backend API using localStorage
