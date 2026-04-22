@@ -10,11 +10,12 @@ import MedicationLog from "../MedicationLog/MedicationLog";
 import ClientList from "../ClientList/ClientList";
 import Profile from "../Profile/Profile";
 import EditProfileModal from "../EditProfileModal/EditProfileModal";
+import AddClientModal from "../AddClientModal/AddClientModal";
 import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import CurrentUserContext from "../../contexts/CurrentUserContext";
 import { signup, signin, getUser } from "../../utils/auth";
 import updateUser from "../../utils/updateUser";
-import { getClients } from "../../utils/api";
+import { getClients, addClient } from "../../utils/api";
 
 function App() {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ function App() {
         .catch((err) => {
           console.error("Failed to load clients:", err);
           setDataError(
-            "Sorry, something went wrong during the request. There may be a connection issue or the server may be down. Please try again later."
+            "Sorry, something went wrong during the request. There may be a connection issue or the server may be down. Please try again later.",
           );
           setIsLoading(false);
         });
@@ -121,7 +122,7 @@ function App() {
     setRegisterError("");
     signup(userData)
       .then(() =>
-        signin({ email: userData.email, password: userData.password })
+        signin({ email: userData.email, password: userData.password }),
       )
       .then((res) => {
         if (res && res.token) {
@@ -146,6 +147,18 @@ function App() {
     setActiveModal("edit-profile");
   };
 
+  const handleAddClientClick = () => {
+    setActiveModal("add-client");
+  };
+
+  const handleAddClient = (clientData) => {
+    if (!token) return Promise.reject(new Error("No token"));
+    return addClient(clientData, token).then((newClient) => {
+      setClients([...clients, newClient]);
+      return newClient;
+    });
+  };
+
   const handleUpdateUser = (userData) => {
     if (!token) return;
     updateUser(userData, token)
@@ -154,6 +167,19 @@ function App() {
         closeModal();
       })
       .catch((err) => console.error("Update user failed:", err));
+  };
+
+  const refreshClients = () => {
+    if (!token) return Promise.reject(new Error("No token"));
+    return getClients(token)
+      .then((data) => {
+        setClients(data);
+        return data;
+      })
+      .catch((err) => {
+        console.error("Failed to refresh clients:", err);
+        throw err;
+      });
   };
 
   // ESC key handler to close modals
@@ -181,6 +207,7 @@ function App() {
           onRegisterClick={handleRegisterClick}
           onLogout={handleLogout}
           currentUser={currentUser}
+          onAddClient={handleAddClientClick}
         />
         <Main>
           <Routes>
@@ -228,7 +255,11 @@ function App() {
               path="/client/:clientId"
               element={
                 <ProtectedRoute isLoggedIn={isLoggedInDerived}>
-                  <MedicationLog clients={clients} currentUser={currentUser} />
+                  <MedicationLog
+                    clients={clients}
+                    currentUser={currentUser}
+                    refreshClients={refreshClients}
+                  />
                 </ProtectedRoute>
               }
             />
@@ -273,6 +304,11 @@ function App() {
           onClose={closeModal}
           onUpdateUser={handleUpdateUser}
           currentUser={currentUser}
+        />
+        <AddClientModal
+          isOpen={activeModal === "add-client"}
+          onClose={closeModal}
+          onAddClient={handleAddClient}
         />
       </div>
     </CurrentUserContext.Provider>

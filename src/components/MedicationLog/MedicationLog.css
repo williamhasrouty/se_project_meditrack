@@ -8,6 +8,32 @@
   margin-bottom: 20px;
 }
 
+.medication-log__header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.medication-log__add-btn {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.medication-log__add-btn:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
 .medication-log__back-btn {
   display: inline-flex;
   align-items: center;
@@ -89,6 +115,11 @@
   padding-left: 8px;
 }
 
+.medication-log__th_edit {
+  width: 50px;
+  min-width: 50px;
+}
+
 .medication-log__th_time {
   width: 8%;
   min-width: 50px;
@@ -96,6 +127,26 @@
 
 .medication-log__th_day {
   width: calc(72% / 31);
+}
+
+.medication-log__edit-cell {
+  text-align: center;
+  padding: 6px 4px;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.medication-log__edit-btn {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  transition: transform 0.2s ease;
+}
+
+.medication-log__edit-btn:hover {
+  transform: scale(1.2);
 }
 
 .medication-log__row {

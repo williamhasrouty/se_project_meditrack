@@ -9,6 +9,7 @@ function Header({
   onRegisterClick,
   onLogout,
   currentUser,
+  onAddClient,
 }) {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
@@ -49,6 +50,7 @@ function Header({
         onRegisterClick={onRegisterClick}
         onLogout={onLogout}
         currentUser={currentUser}
+        onAddClient={onAddClient}
       />
     </header>
   );

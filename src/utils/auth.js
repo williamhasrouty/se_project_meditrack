@@ -1,77 +1,52 @@
-// Authentication functions using localStorage (simulating backend API)
-// TODO: Replace with actual API calls when backend is ready
-// These functions simulate network requests using Promises and localStorage
+import { BASE_URL } from "./constants";
 
-// Simulates POST /signup - Register a new user
-function signup({ name, email, password }) {
-  return new Promise((resolve, reject) => {
-    // Simulate API validation delay
-    setTimeout(() => {
-      const username = email.split("@")[0];
-      const authKey = `auth_${username}`;
-      const existingAuth = localStorage.getItem(authKey);
+// Authentication API functions
 
-      if (existingAuth) {
-        reject(new Error("User already registered. Please log in instead."));
-        return;
-      }
-
-      // Store authentication data (simulating database)
-      const authData = { email, password };
-      localStorage.setItem(authKey, JSON.stringify(authData));
-
-      // Create and store user profile (simulating database)
-      const newUser = { username, name };
-      const profileKey = `userProfile_${username}`;
-      localStorage.setItem(profileKey, JSON.stringify(newUser));
-
-      resolve({ username, name });
-    }, 300);
+// POST /signup - Register a new user
+function signup({ name, email, password, initials }) {
+  return fetch(`${BASE_URL}/signup`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name, email, password, initials }),
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return res.json().then((err) => Promise.reject(err));
   });
 }
 
-// Simulates POST /signin - Login an existing user
+// POST /signin - Login an existing user
 function signin({ email, password }) {
-  return new Promise((resolve, reject) => {
-    // Simulate API request delay
-    setTimeout(() => {
-      const username = email.split("@")[0];
-      const authKey = `auth_${username}`;
-      const storedAuth = localStorage.getItem(authKey);
-
-      if (!storedAuth) {
-        reject(new Error("User not found. Please register first."));
-        return;
-      }
-
-      const authData = JSON.parse(storedAuth);
-      if (authData.password !== password) {
-        reject(new Error("Incorrect password. Please try again."));
-        return;
-      }
-
-      // Return token (simulating JWT token from backend)
-      resolve({ token: username });
-    }, 300);
+  return fetch(`${BASE_URL}/signin`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return res.json().then((err) => Promise.reject(err));
   });
 }
 
-// Simulates GET /users/me - Verify token and get current user
+// GET /users/me - Verify token and get current user
 function getUser(token) {
-  return new Promise((resolve, reject) => {
-    // Simulate API request delay
-    setTimeout(() => {
-      const profileKey = `userProfile_${token}`;
-      const savedProfile = localStorage.getItem(profileKey);
-
-      if (!savedProfile) {
-        reject(new Error("User profile not found"));
-        return;
-      }
-
-      const user = JSON.parse(savedProfile);
-      resolve(user);
-    }, 200);
+  return fetch(`${BASE_URL}/users/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return res.json().then((err) => Promise.reject(err));
   });
 }
 

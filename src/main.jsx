@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./components/App/App.jsx";
 
-const basename = import.meta.env.PROD ? "/se_project_meditrack" : "/";
+const basename = "/";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

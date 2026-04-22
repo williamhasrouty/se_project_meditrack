@@ -1,7 +1,7 @@
 // Client and Medication API functions (simulating backend)
 // TODO: Replace with actual API calls when backend is ready
 
-import { defaultClients } from "./constants";
+import { defaultClients, BASE_URL } from "./constants";
 
 // Simulate API delay
 function simulateDelay(ms = 500) {
@@ -10,135 +10,170 @@ function simulateDelay(ms = 500) {
 
 // Get all clients for the logged-in user
 function getClients(token) {
-  return simulateDelay(300).then(() => {
-    if (!token) {
-      return Promise.reject(new Error("Unauthorized: No token provided"));
+  return fetch(`${BASE_URL}/clients`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     }
-    // In a real app, this would fetch user-specific clients from backend
-    return Promise.resolve(defaultClients);
+    return res.json().then((err) => Promise.reject(err));
   });
 }
 
 // Get a single client by ID
 function getClientById(clientId, token) {
-  return simulateDelay(200).then(() => {
-    if (!token) {
-      return Promise.reject(new Error("Unauthorized: No token provided"));
+  return fetch(`${BASE_URL}/clients/${clientId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     }
-    const client = defaultClients.find((c) => c._id === Number(clientId));
-    if (!client) {
-      return Promise.reject(new Error("Client not found"));
-    }
-    return Promise.resolve(client);
+    return res.json().then((err) => Promise.reject(err));
   });
 }
 
 // Add a new client
 function addClient(clientData, token) {
-  return simulateDelay(500).then(() => {
-    if (!token) {
-      return Promise.reject(new Error("Unauthorized: No token provided"));
+  return fetch(`${BASE_URL}/clients`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(clientData),
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     }
-    const newClient = {
-      _id: Date.now(), // Generate unique ID
-      name: clientData.name,
-      medications: [],
-      createdAt: new Date().toISOString(),
-    };
-    return Promise.resolve(newClient);
+    return res.json().then((err) => Promise.reject(err));
   });
 }
 
 // Update a client
 function updateClient(clientId, clientData, token) {
-  return simulateDelay(500).then(() => {
-    if (!token) {
-      return Promise.reject(new Error("Unauthorized: No token provided"));
+  return fetch(`${BASE_URL}/clients/${clientId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(clientData),
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     }
-    const updatedClient = {
-      _id: clientId,
-      ...clientData,
-      updatedAt: new Date().toISOString(),
-    };
-    return Promise.resolve(updatedClient);
+    return res.json().then((err) => Promise.reject(err));
   });
 }
 
 // Delete a client
 function deleteClient(clientId, token) {
-  return simulateDelay(400).then(() => {
-    if (!token) {
-      return Promise.reject(new Error("Unauthorized: No token provided"));
+  return fetch(`${BASE_URL}/clients/${clientId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     }
-    return Promise.resolve({ message: "Client deleted successfully" });
+    return res.json().then((err) => Promise.reject(err));
   });
 }
 
 // Add a medication to a client
 function addMedication(clientId, medicationData, token) {
-  return simulateDelay(500).then(() => {
-    if (!token) {
-      return Promise.reject(new Error("Unauthorized: No token provided"));
+  return fetch(`${BASE_URL}/clients/${clientId}/medications`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(medicationData),
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     }
-    const newMedication = {
-      id: Date.now(), // Generate unique ID
-      name: medicationData.name,
-      times: medicationData.times,
-      createdAt: new Date().toISOString(),
-    };
-    return Promise.resolve(newMedication);
+    return res.json().then((err) => Promise.reject(err));
   });
 }
 
 // Update a medication
 function updateMedication(clientId, medicationId, medicationData, token) {
-  return simulateDelay(500).then(() => {
-    if (!token) {
-      return Promise.reject(new Error("Unauthorized: No token provided"));
+  return fetch(`${BASE_URL}/clients/${clientId}/medications/${medicationId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(medicationData),
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     }
-    const updatedMedication = {
-      id: medicationId,
-      ...medicationData,
-      updatedAt: new Date().toISOString(),
-    };
-    return Promise.resolve(updatedMedication);
+    return res.json().then((err) => Promise.reject(err));
   });
 }
 
 // Delete a medication
 function deleteMedication(clientId, medicationId, token) {
-  return simulateDelay(400).then(() => {
-    if (!token) {
-      return Promise.reject(new Error("Unauthorized: No token provided"));
+  return fetch(`${BASE_URL}/clients/${clientId}/medications/${medicationId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     }
-    return Promise.resolve({ message: "Medication deleted successfully" });
+    return res.json().then((err) => Promise.reject(err));
   });
 }
 
 // Save medication administration record
 function saveMedicationAdministration(administrationData, token) {
-  return simulateDelay(300).then(() => {
-    if (!token) {
-      return Promise.reject(new Error("Unauthorized: No token provided"));
+  const { clientId, month, year, medicationId, records } = administrationData;
+  return fetch(`${BASE_URL}/administrations/${clientId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ month, year, medicationId, records }),
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     }
-    // In real app, this would save to backend
-    // For now, we're using localStorage directly in components
-    return Promise.resolve({
-      message: "Administration saved successfully",
-      data: administrationData,
-    });
+    return res.json().then((err) => Promise.reject(err));
   });
 }
 
 // Get medication administration records
 function getMedicationAdministrations(clientId, month, year, token) {
-  return simulateDelay(300).then(() => {
-    if (!token) {
-      return Promise.reject(new Error("Unauthorized: No token provided"));
+  return fetch(
+    `${BASE_URL}/administrations/${clientId}?month=${month}&year=${year}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     }
-    const storageKey = `administrations_${clientId}_${month}_${year}`;
-    const saved = localStorage.getItem(storageKey);
-    return Promise.resolve(saved ? JSON.parse(saved) : {});
+  ).then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return res.json().then((err) => Promise.reject(err));
   });
 }
 
