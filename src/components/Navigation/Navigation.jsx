@@ -8,6 +8,7 @@ function Navigation({
   onRegisterClick,
   onLogout,
   currentUser,
+  onAddClient,
 }) {
   const location = useLocation();
   const isProfilePage = location.pathname === "/profile";
@@ -50,6 +51,14 @@ function Navigation({
             >
               {isProfilePage ? "Clients" : currentUser?.name || "My Profile"}
             </NavLink>
+            {currentUser?.role === "admin" && (
+              <button
+                className="navigation__button navigation__button_add-client"
+                onClick={onAddClient}
+              >
+                + Add Client
+              </button>
+            )}
             <button
               className="navigation__button navigation__button_logout"
               onClick={onLogout}

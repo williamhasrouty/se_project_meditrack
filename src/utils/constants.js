@@ -40,6 +40,6 @@ export const defaultClients = [
 /* eslint-disable no-undef */
 export const BASE_URL =
   process.env.NODE_ENV === "production"
-    ? "https://api.meditrack.com"
+    ? "https://api.meditrack.jumpingcrab.com"
     : "http://localhost:3001";
 /* eslint-enable no-undef */

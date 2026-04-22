@@ -5,30 +5,94 @@ import {
   getMedicationByBrandName,
   parseMedicationData,
 } from "../../utils/fdaApi";
+import {
+  getMedicationAdministrations,
+  saveMedicationAdministration,
+  addMedication,
+  updateMedication,
+  deleteMedication,
+} from "../../utils/api";
+import AddMedicationModal from "../AddMedicationModal/AddMedicationModal";
+import EditMedicationModal from "../EditMedicationModal/EditMedicationModal";
 
-function MedicationLog({ clients, currentUser }) {
+function MedicationLog({ clients, currentUser, refreshClients }) {
   const { clientId } = useParams();
-  const client = clients?.find((c) => c._id === Number(clientId));
+  const client = clients?.find((c) => c._id === clientId);
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
   const currentYear = currentDate.getFullYear();
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-  // Create a unique key for localStorage based on client, month, and year
-  const storageKey = `administrations_${clientId}_${currentMonth}_${currentYear}`;
-
-  const [administrations, setAdministrations] = useState(() => {
-    const saved = localStorage.getItem(storageKey);
-    return saved ? JSON.parse(saved) : {};
-  });
+  const [administrations, setAdministrations] = useState({});
   const [selectedMedication, setSelectedMedication] = useState(null);
   const [medicationInfo, setMedicationInfo] = useState(null);
   const [isLoadingInfo, setIsLoadingInfo] = useState(false);
+  const [isLoadingAdministrations, setIsLoadingAdministrations] =
+    useState(true);
+  const [activeModal, setActiveModal] = useState(null);
+  const [editingMedication, setEditingMedication] = useState(null);
 
-  // Save administrations to localStorage whenever they change
+  const isAdmin = currentUser?.role === "admin";
+
+  // Load administrations from API on mount
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(administrations));
-  }, [administrations, storageKey]);
+    const token = localStorage.getItem("jwt");
+    if (!token || !clientId) return;
+
+    setIsLoadingAdministrations(true);
+    getMedicationAdministrations(clientId, currentMonth, currentYear, token)
+      .then((data) => {
+        setAdministrations(data.records || {});
+        setIsLoadingAdministrations(false);
+      })
+      .catch((error) => {
+        console.error("Error loading administrations:", error);
+        setIsLoadingAdministrations(false);
+      });
+  }, [clientId, currentMonth, currentYear]);
+
+  // Save administrations to API whenever they change
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    if (!token || !clientId || isLoadingAdministrations) return;
+
+    // Don't save if there are no administrations
+    if (Object.keys(administrations).length === 0) return;
+
+    // Group administrations by medication
+    const medicationGroups = {};
+    Object.keys(administrations).forEach((key) => {
+      const [medicationId] = key.split("-");
+      // Validate medicationId format (24-character hex string)
+      if (!medicationId || medicationId.length !== 24) return;
+      if (!medicationGroups[medicationId]) {
+        medicationGroups[medicationId] = {};
+      }
+      medicationGroups[medicationId][key] = administrations[key];
+    });
+
+    // Save each medication's administrations
+    Object.keys(medicationGroups).forEach((medicationId) => {
+      saveMedicationAdministration(
+        {
+          clientId,
+          month: currentMonth,
+          year: currentYear,
+          medicationId,
+          records: medicationGroups[medicationId],
+        },
+        token,
+      ).catch((error) => {
+        console.error("Error saving administrations:", error);
+      });
+    });
+  }, [
+    administrations,
+    clientId,
+    currentMonth,
+    currentYear,
+    isLoadingAdministrations,
+  ]);
 
   if (!client) {
     return (
@@ -102,11 +166,63 @@ function MedicationLog({ clients, currentUser }) {
     setMedicationInfo(null);
   };
 
+  const handleAddMedication = (medicationData) => {
+    const token = localStorage.getItem("jwt");
+    if (!token) return Promise.reject(new Error("No token"));
+
+    return addMedication(clientId, medicationData, token).then(() => {
+      // Refresh clients data without page reload
+      if (refreshClients) {
+        return refreshClients();
+      }
+    });
+  };
+
+  const handleEditMedication = (medicationId, medicationData) => {
+    const token = localStorage.getItem("jwt");
+    if (!token) return Promise.reject(new Error("No token"));
+
+    return updateMedication(clientId, medicationId, medicationData, token).then(
+      () => {
+        // Refresh clients data without page reload
+        if (refreshClients) {
+          return refreshClients();
+        }
+      },
+    );
+  };
+
+  const handleDeleteMedication = (medicationId) => {
+    const token = localStorage.getItem("jwt");
+    if (!token) return Promise.reject(new Error("No token"));
+
+    return deleteMedication(clientId, medicationId, token).then(() => {
+      // Refresh clients data without page reload
+      if (refreshClients) {
+        return refreshClients();
+      }
+    });
+  };
+
+  const openAddMedicationModal = () => {
+    setActiveModal("add-medication");
+  };
+
+  const openEditMedicationModal = (medication) => {
+    setEditingMedication(medication);
+    setActiveModal("edit-medication");
+  };
+
+  const closeModal = () => {
+    setActiveModal(null);
+    setEditingMedication(null);
+  };
+
   const monthName = new Date(currentYear, currentMonth).toLocaleString(
     "default",
     {
       month: "long",
-    }
+    },
   );
 
   return (
@@ -115,10 +231,22 @@ function MedicationLog({ clients, currentUser }) {
         <Link to="/" className="medication-log__back-btn">
           ← Back to Client List
         </Link>
-        <h1 className="medication-log__title">{client.name}</h1>
-        <h2 className="medication-log__subtitle">
-          Medication Administration Record - {monthName} {currentYear}
-        </h2>
+        <div className="medication-log__header-content">
+          <div>
+            <h1 className="medication-log__title">{client.name}</h1>
+            <h2 className="medication-log__subtitle">
+              Medication Administration Record - {monthName} {currentYear}
+            </h2>
+          </div>
+          {isAdmin && (
+            <button
+              className="medication-log__add-btn"
+              onClick={openAddMedicationModal}
+            >
+              + Add Medication
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="medication-log__table-container">
@@ -128,6 +256,11 @@ function MedicationLog({ clients, currentUser }) {
               <th className="medication-log__th medication-log__th_medication">
                 Medication
               </th>
+              {isAdmin && (
+                <th className="medication-log__th medication-log__th_edit">
+                  Edit
+                </th>
+              )}
               <th className="medication-log__th medication-log__th_time">
                 Time
               </th>
@@ -157,6 +290,22 @@ function MedicationLog({ clients, currentUser }) {
                       {medication.name}
                     </td>
                   )}
+                  {isAdmin && timeIndex === 0 && (
+                    <td
+                      className="medication-log__edit-cell"
+                      rowSpan={medication.times.length}
+                    >
+                      <button
+                        className="medication-log__edit-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEditMedicationModal(medication);
+                        }}
+                      >
+                        ✏️
+                      </button>
+                    </td>
+                  )}
                   <td className="medication-log__time-cell">{time}</td>
                   {Array.from({ length: daysInMonth }, (_, i) => {
                     const day = i + 1;
@@ -174,7 +323,7 @@ function MedicationLog({ clients, currentUser }) {
                     );
                   })}
                 </tr>
-              ))
+              )),
             )}
           </tbody>
         </table>
@@ -253,6 +402,20 @@ function MedicationLog({ clients, currentUser }) {
           </div>
         </div>
       )}
+
+      <AddMedicationModal
+        isOpen={activeModal === "add-medication"}
+        onClose={closeModal}
+        onAddMedication={handleAddMedication}
+      />
+
+      <EditMedicationModal
+        isOpen={activeModal === "edit-medication"}
+        onClose={closeModal}
+        onEditMedication={handleEditMedication}
+        onDeleteMedication={handleDeleteMedication}
+        medication={editingMedication}
+      />
     </section>
   );
 }
