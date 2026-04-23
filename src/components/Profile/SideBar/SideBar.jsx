@@ -8,9 +8,8 @@ function SideBar({ onEditProfile, onLogout, currentUser }) {
       const lastName = nameParts[nameParts.length - 1];
       return (
         firstName.charAt(0).toUpperCase() +
-        firstName.charAt(1).toLowerCase() +
-        lastName.charAt(0).toUpperCase() +
-        lastName.charAt(1).toLowerCase()
+        lastName.charAt(0).toUpperCase() 
+        
       );
     }
     return name.charAt(0).toUpperCase() + name.charAt(1).toLowerCase();

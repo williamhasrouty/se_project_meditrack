@@ -1,22 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
 
-function AddClientModal({ onClose, onAddClient, isOpen }) {
+function EditClientModal({ onClose, onEditClient, isOpen, client }) {
   const [name, setName] = useState("");
   const [region, setRegion] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    if (client) {
+      setName(client.name || "");
+      setRegion(client.region || "");
+    }
+  }, [client]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
-    onAddClient({ name, region })
+    onEditClient({ name, region })
       .then(() => {
-        setName("");
-        setRegion("");
         onClose();
       })
       .catch((err) => {
-        console.error("Error adding client:", err);
+        console.error("Error editing client:", err);
       })
       .finally(() => {
         setIsLoading(false);
@@ -25,8 +30,8 @@ function AddClientModal({ onClose, onAddClient, isOpen }) {
 
   return (
     <ModalWithForm
-      title="Add New Client"
-      buttonText={isLoading ? "Saving..." : "Add Client"}
+      title="Edit Client"
+      buttonText={isLoading ? "Saving..." : "Save Changes"}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={handleSubmit}
@@ -66,4 +71,4 @@ function AddClientModal({ onClose, onAddClient, isOpen }) {
   );
 }
 
-export default AddClientModal;
+export default EditClientModal;
