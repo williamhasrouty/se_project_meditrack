@@ -1,6 +1,6 @@
 import "./MedicationLog.css";
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   getMedicationByBrandName,
   parseMedicationData,
@@ -31,6 +31,7 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
     useState(true);
   const [activeModal, setActiveModal] = useState(null);
   const [editingMedication, setEditingMedication] = useState(null);
+  const saveTimeoutRef = useRef(null);
 
   const isAdmin = currentUser?.role === "admin";
 
@@ -51,7 +52,7 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
       });
   }, [clientId, currentMonth, currentYear]);
 
-  // Save administrations to API whenever they change
+  // Save administrations to API whenever they change (with debounce)
   useEffect(() => {
     const token = localStorage.getItem("jwt");
     if (!token || !clientId || isLoadingAdministrations) return;
@@ -59,33 +60,58 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
     // Don't save if there are no administrations
     if (Object.keys(administrations).length === 0) return;
 
-    // Group administrations by medication
-    const medicationGroups = {};
-    Object.keys(administrations).forEach((key) => {
-      const [medicationId] = key.split("-");
-      // Validate medicationId format (24-character hex string)
-      if (!medicationId || medicationId.length !== 24) return;
-      if (!medicationGroups[medicationId]) {
-        medicationGroups[medicationId] = {};
-      }
-      medicationGroups[medicationId][key] = administrations[key];
-    });
+    // Clear any existing timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
 
-    // Save each medication's administrations
-    Object.keys(medicationGroups).forEach((medicationId) => {
-      saveMedicationAdministration(
-        {
-          clientId,
-          month: currentMonth,
-          year: currentYear,
-          medicationId,
-          records: medicationGroups[medicationId],
-        },
-        token,
-      ).catch((error) => {
-        console.error("Error saving administrations:", error);
+    // Debounce the save by 500ms
+    saveTimeoutRef.current = setTimeout(() => {
+      // Group administrations by medication and filter out empty values
+      const medicationGroups = {};
+      Object.keys(administrations).forEach((key) => {
+        const [medicationId] = key.split("-");
+        // Validate medicationId format (24-character hex string)
+        if (!medicationId || medicationId.length !== 24) return;
+
+        // Only include non-empty values
+        const value = administrations[key];
+        if (value && value.trim() !== "") {
+          if (!medicationGroups[medicationId]) {
+            medicationGroups[medicationId] = {};
+          }
+          medicationGroups[medicationId][key] = value;
+        }
       });
-    });
+
+      // Save each medication's administrations (skip if no records)
+      Object.keys(medicationGroups).forEach((medicationId) => {
+        const records = medicationGroups[medicationId];
+
+        // Skip if no records to save
+        if (Object.keys(records).length === 0) return;
+
+        saveMedicationAdministration(
+          {
+            clientId,
+            month: currentMonth,
+            year: currentYear,
+            medicationId,
+            records,
+          },
+          token,
+        ).catch((error) => {
+          console.error("Error saving administrations:", error);
+        });
+      });
+    }, 500);
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
   }, [
     administrations,
     clientId,
@@ -256,11 +282,6 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
               <th className="medication-log__th medication-log__th_medication">
                 Medication
               </th>
-              {isAdmin && (
-                <th className="medication-log__th medication-log__th_edit">
-                  Edit
-                </th>
-              )}
               <th className="medication-log__th medication-log__th_time">
                 Time
               </th>
@@ -278,7 +299,7 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
             {client.medications.map((medication) =>
               medication.times.map((time, timeIndex) => (
                 <tr
-                  key={`${medication.id}-${time}`}
+                  key={`${medication._id}-${time}`}
                   className="medication-log__row"
                 >
                   {timeIndex === 0 && (
@@ -287,35 +308,35 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
                       rowSpan={medication.times.length}
                       onClick={() => handleMedicationClick(medication)}
                     >
-                      {medication.name}
-                    </td>
-                  )}
-                  {isAdmin && timeIndex === 0 && (
-                    <td
-                      className="medication-log__edit-cell"
-                      rowSpan={medication.times.length}
-                    >
-                      <button
-                        className="medication-log__edit-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openEditMedicationModal(medication);
-                        }}
-                      >
-                        ✏️
-                      </button>
+                      <div className="medication-log__medication-content">
+                        <span className="medication-log__medication-name">
+                          {medication.name}
+                        </span>
+                        {isAdmin && (
+                          <button
+                            className="medication-log__edit-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditMedicationModal(medication);
+                            }}
+                            aria-label="Edit medication"
+                          >
+                            Edit
+                          </button>
+                        )}
+                      </div>
                     </td>
                   )}
                   <td className="medication-log__time-cell">{time}</td>
                   {Array.from({ length: daysInMonth }, (_, i) => {
                     const day = i + 1;
-                    const key = `${medication.id}-${day}-${time}`;
+                    const key = `${medication._id}-${day}-${time}`;
                     return (
                       <td
                         key={day}
                         className="medication-log__td medication-log__td_cell"
                         onClick={() =>
-                          handleCellClick(medication.id, day, time)
+                          handleCellClick(medication._id, day, time)
                         }
                       >
                         {administrations[key] || ""}

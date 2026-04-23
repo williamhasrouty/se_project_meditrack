@@ -11,11 +11,19 @@ import ClientList from "../ClientList/ClientList";
 import Profile from "../Profile/Profile";
 import EditProfileModal from "../EditProfileModal/EditProfileModal";
 import AddClientModal from "../AddClientModal/AddClientModal";
+import EditClientModal from "../EditClientModal/EditClientModal";
 import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import CurrentUserContext from "../../contexts/CurrentUserContext";
 import { signup, signin, getUser } from "../../utils/auth";
 import updateUser from "../../utils/updateUser";
-import { getClients, addClient } from "../../utils/api";
+import {
+  getClients,
+  addClient,
+  updateClient,
+  deleteClient,
+  assignClient,
+  getStaffUsers,
+} from "../../utils/api";
 
 function App() {
   const navigate = useNavigate();
@@ -27,6 +35,7 @@ function App() {
   const [clients, setClients] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [dataError, setDataError] = useState("");
+  const [selectedClient, setSelectedClient] = useState(null);
 
   // Derive isLoggedIn from currentUser instead of using useEffect
   const isLoggedInDerived = !!currentUser;
@@ -159,6 +168,40 @@ function App() {
     });
   };
 
+  const handleEditClientClick = (client) => {
+    setSelectedClient(client);
+    setActiveModal("edit-client");
+  };
+
+  const handleUpdateClient = (clientData) => {
+    if (!token || !selectedClient)
+      return Promise.reject(new Error("No token or client"));
+    return updateClient(selectedClient._id, clientData, token).then(
+      (updatedClient) => {
+        setClients(
+          clients.map((client) =>
+            client._id === updatedClient._id ? updatedClient : client,
+          ),
+        );
+        return updatedClient;
+      },
+    );
+  };
+
+  const handleDeleteClient = (clientId) => {
+    if (!token) return Promise.reject(new Error("No token"));
+    if (
+      window.confirm(
+        "Are you sure you want to delete this client? This will also delete all their medications.",
+      )
+    ) {
+      return deleteClient(clientId, token).then(() => {
+        setClients(clients.filter((client) => client._id !== clientId));
+      });
+    }
+    return Promise.resolve();
+  };
+
   const handleUpdateUser = (userData) => {
     if (!token) return;
     updateUser(userData, token)
@@ -180,6 +223,31 @@ function App() {
         console.error("Failed to refresh clients:", err);
         throw err;
       });
+  };
+
+  const handleAssignClient = (clientId, staffId) => {
+    if (!token) return Promise.reject(new Error("No token"));
+    return assignClient(clientId, staffId, token)
+      .then((updatedClient) => {
+        setClients(
+          clients.map((client) =>
+            client._id === updatedClient._id ? updatedClient : client,
+          ),
+        );
+        return updatedClient;
+      })
+      .catch((err) => {
+        console.error("Failed to assign client:", err);
+        throw err;
+      });
+  };
+
+  const handleGetStaffUsers = () => {
+    if (!token) return Promise.reject(new Error("No token"));
+    return getStaffUsers(token).catch((err) => {
+      console.error("Failed to fetch staff users:", err);
+      throw err;
+    });
   };
 
   // ESC key handler to close modals
@@ -219,6 +287,11 @@ function App() {
                     clients={clients}
                     isLoading={isLoading}
                     error={dataError}
+                    onEditClient={handleEditClientClick}
+                    onDeleteClient={handleDeleteClient}
+                    currentUser={currentUser}
+                    onAssignClient={handleAssignClient}
+                    onGetStaffUsers={handleGetStaffUsers}
                   />
                 ) : (
                   <div className="app__welcome">
@@ -248,6 +321,8 @@ function App() {
                   clients={clients}
                   isLoading={isLoading}
                   error={dataError}
+                  onEditClient={handleEditClientClick}
+                  onDeleteClient={handleDeleteClient}
                 />
               }
             />
@@ -309,6 +384,12 @@ function App() {
           isOpen={activeModal === "add-client"}
           onClose={closeModal}
           onAddClient={handleAddClient}
+        />
+        <EditClientModal
+          isOpen={activeModal === "edit-client"}
+          onClose={closeModal}
+          onEditClient={handleUpdateClient}
+          client={selectedClient}
         />
       </div>
     </CurrentUserContext.Provider>

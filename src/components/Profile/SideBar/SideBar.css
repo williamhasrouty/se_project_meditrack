@@ -16,8 +16,9 @@
   display: block;
   font-size: 24px;
   border: 3px solid transparent;
-  background: linear-gradient(white, white) padding-box,
-    linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%) border-box;
+  background:
+    linear-gradient(white, white) padding-box,
+    linear-gradient(135deg, #0284c7 0%, #7dd3fc 100%) border-box;
 }
 
 .sidebar__avatar-placeholder {
@@ -27,7 +28,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #0284c7 0%, #7dd3fc 100%);
   color: white;
   font-weight: 700;
   font-size: 20px;
@@ -71,8 +72,8 @@
 }
 
 .sidebar__edit-btn:hover {
-  background-color: rgba(37, 99, 235, 0.08);
-  color: #2563eb;
+  background-color: rgba(2, 132, 199, 0.08);
+  color: #0284c7;
 }
 
 .sidebar__logout-btn:hover {

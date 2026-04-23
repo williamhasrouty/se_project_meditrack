@@ -3,6 +3,20 @@
 
 import { defaultClients, BASE_URL } from "./constants";
 
+// Helper function to handle API responses with proper error handling
+function handleResponse(res) {
+  if (res.ok) {
+    return res.json();
+  }
+  // Try to parse error as JSON, fallback to statusText for non-JSON errors (like rate limits)
+  return res
+    .json()
+    .catch(() => {
+      throw new Error(res.statusText || `Error: ${res.status}`);
+    })
+    .then((err) => Promise.reject(err));
+}
+
 // Simulate API delay
 function simulateDelay(ms = 500) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -16,12 +30,7 @@ function getClients(token) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return res.json().then((err) => Promise.reject(err));
-  });
+  }).then(handleResponse);
 }
 
 // Get a single client by ID
@@ -32,12 +41,7 @@ function getClientById(clientId, token) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return res.json().then((err) => Promise.reject(err));
-  });
+  }).then(handleResponse);
 }
 
 // Add a new client
@@ -49,12 +53,7 @@ function addClient(clientData, token) {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(clientData),
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return res.json().then((err) => Promise.reject(err));
-  });
+  }).then(handleResponse);
 }
 
 // Update a client
@@ -66,12 +65,7 @@ function updateClient(clientId, clientData, token) {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(clientData),
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return res.json().then((err) => Promise.reject(err));
-  });
+  }).then(handleResponse);
 }
 
 // Delete a client
@@ -82,12 +76,7 @@ function deleteClient(clientId, token) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return res.json().then((err) => Promise.reject(err));
-  });
+  }).then(handleResponse);
 }
 
 // Add a medication to a client
@@ -99,12 +88,7 @@ function addMedication(clientId, medicationData, token) {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(medicationData),
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return res.json().then((err) => Promise.reject(err));
-  });
+  }).then(handleResponse);
 }
 
 // Update a medication
@@ -116,12 +100,7 @@ function updateMedication(clientId, medicationId, medicationData, token) {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(medicationData),
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return res.json().then((err) => Promise.reject(err));
-  });
+  }).then(handleResponse);
 }
 
 // Delete a medication
@@ -132,12 +111,7 @@ function deleteMedication(clientId, medicationId, token) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return res.json().then((err) => Promise.reject(err));
-  });
+  }).then(handleResponse);
 }
 
 // Save medication administration record
@@ -150,12 +124,7 @@ function saveMedicationAdministration(administrationData, token) {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ month, year, medicationId, records }),
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return res.json().then((err) => Promise.reject(err));
-  });
+  }).then(handleResponse);
 }
 
 // Get medication administration records
@@ -168,13 +137,31 @@ function getMedicationAdministrations(clientId, month, year, token) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    }
-  ).then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return res.json().then((err) => Promise.reject(err));
-  });
+    },
+  ).then(handleResponse);
+}
+
+// Assign client to staff (admin only)
+function assignClient(clientId, staffId, token) {
+  return fetch(`${BASE_URL}/clients/${clientId}/assign`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ staffId: staffId || null }),
+  }).then(handleResponse);
+}
+
+// Get all staff users (admin only)
+function getStaffUsers(token) {
+  return fetch(`${BASE_URL}/users/staff`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(handleResponse);
 }
 
 export {
@@ -188,4 +175,6 @@ export {
   deleteMedication,
   saveMedicationAdministration,
   getMedicationAdministrations,
+  assignClient,
+  getStaffUsers,
 };

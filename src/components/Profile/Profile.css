@@ -47,16 +47,16 @@
 }
 
 .profile__stat-card:hover {
-  border-color: #2563eb;
+  border-color: #0284c7;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
 }
 
 .profile__stat-number {
   margin: 0 0 8px;
   font-size: 48px;
   font-weight: 700;
-  background: linear-gradient(135deg, #2563eb, #8b5cf6);
+  background: linear-gradient(135deg, #0284c7, #7dd3fc);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -99,7 +99,7 @@
 }
 
 .profile__client-item:hover {
-  border-color: #2563eb;
+  border-color: #0284c7;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -131,7 +131,7 @@
 
 .profile__client-arrow {
   font-size: 24px;
-  color: #2563eb;
+  color: #0284c7;
   transition: transform 200ms ease-in-out;
 }
 

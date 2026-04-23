@@ -42,16 +42,16 @@
   margin-bottom: 20px;
   font-size: 16px;
   font-weight: 600;
-  color: #2563eb;
+  color: #0284c7;
   text-decoration: none;
   background: white;
-  border: 2px solid #2563eb;
+  border: 2px solid #0284c7;
   border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .medication-log__back-btn:hover {
-  background: #2563eb;
+  background: #0284c7;
   color: white;
   transform: translateX(-4px);
 }
@@ -60,7 +60,7 @@
   margin: 0 0 4px;
   font-size: 24px;
   font-weight: 700;
-  background: linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #0284c7 0%, #7dd3fc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -96,28 +96,23 @@
 }
 
 .medication-log__th {
-  background: linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%);
+  background: #0284c7;
   color: white;
   padding: 6px 4px;
   text-align: center;
   font-weight: 600;
   font-size: 11px;
-  border: 1px solid #1e40af;
+  border: 1px solid #0284c7;
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
 .medication-log__th_medication {
-  width: 20%;
-  min-width: 140px;
+  width: 25%;
+  min-width: 180px;
   text-align: left;
   padding-left: 8px;
-}
-
-.medication-log__th_edit {
-  width: 50px;
-  min-width: 50px;
 }
 
 .medication-log__th_time {
@@ -126,27 +121,48 @@
 }
 
 .medication-log__th_day {
-  width: calc(72% / 31);
+  width: calc(67% / 31);
 }
 
-.medication-log__edit-cell {
-  text-align: center;
-  padding: 6px 4px;
-  border: 1px solid #e5e7eb;
+.medication-log__medication-cell {
+  text-align: left;
+  padding: 6px 8px;
+  font-weight: 600;
+  color: #1f2937;
   background-color: #f9fafb;
+  font-size: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.medication-log__medication-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.medication-log__medication-name {
+  flex: 1;
 }
 
 .medication-log__edit-btn {
-  background: transparent;
-  border: none;
-  font-size: 16px;
+  background: #f0f9ff;
+  border: 1px solid #bfdbfe;
+  color: #0284c7;
+  font-size: 11px;
+  font-weight: 600;
   cursor: pointer;
-  padding: 4px;
-  transition: transform 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  font-family: "Inter", Arial, sans-serif;
 }
 
 .medication-log__edit-btn:hover {
-  transform: scale(1.2);
+  background: #e0f2fe;
+  border-color: #93c5fd;
+  transform: translateY(-1px);
 }
 
 .medication-log__row {
@@ -164,24 +180,13 @@
   border: 1px solid #e5e7eb;
 }
 
-.medication-log__medication-cell {
-  text-align: left;
-  padding: 6px 2px;
-  padding-left: 8px;
-  font-weight: 600;
-  color: #1f2937;
-  background-color: #f9fafb;
-  font-size: 12px;
-  border: 1px solid #e5e7eb;
-}
-
 .medication-log__medication-cell_clickable {
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .medication-log__medication-cell_clickable:hover {
-  color: #2563eb;
+  color: #0284c7;
   text-decoration: underline;
 }
 
@@ -199,18 +204,18 @@
   cursor: pointer;
   transition: all 0.15s ease;
   font-weight: 600;
-  color: #2563eb;
+  color: #0284c7;
   min-height: 30px;
   font-size: 11px;
 }
 
 .medication-log__td_cell:hover {
-  background-color: #eff6ff;
-  border-color: #2563eb;
+  background-color: #f0f9ff;
+  border-color: #0284c7;
 }
 
 .medication-log__td_cell:active {
-  background-color: #dbeafe;
+  background-color: #e0f2fe;
 }
 
 .medication-log__footer {
@@ -246,7 +251,7 @@
 .medication-modal__content {
   position: relative;
   background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
-  border: 1px solid rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(2, 132, 199, 0.1);
   padding: 32px;
   max-width: 700px;
   width: 100%;
@@ -273,8 +278,8 @@
 }
 
 .medication-modal__close:hover {
-  background-color: rgba(37, 99, 235, 0.08);
-  color: #2563eb;
+  background-color: rgba(2, 132, 199, 0.08);
+  color: #0284c7;
   transform: rotate(90deg);
 }
 
@@ -282,7 +287,7 @@
   margin: 0 0 24px;
   font-size: 28px;
   font-weight: 700;
-  background: linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #0284c7 0%, #7dd3fc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -315,7 +320,7 @@
   margin: 0 0 8px;
   font-size: 14px;
   font-weight: 700;
-  color: #2563eb;
+  color: #0284c7;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }

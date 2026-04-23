@@ -17,7 +17,7 @@
   font-size: 36px;
   color: #1f2937;
   margin-bottom: 24px;
-  background: linear-gradient(135deg, #2563eb, #8b5cf6);
+  background: linear-gradient(135deg, #0284c7, #7dd3fc);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -46,7 +46,7 @@
 }
 
 .app__button_primary {
-  background: linear-gradient(135deg, #2563eb, #1e40af);
+  background: linear-gradient(135deg, #0284c7, #0369a1);
   color: #ffffff;
 }
 
