@@ -49,16 +49,8 @@ function Navigation({
                 `navigation__link ${isActive ? "navigation__link_active" : ""}`
               }
             >
-              {isProfilePage ? "Clients" : currentUser?.name || "My Profile"}
+              {isProfilePage ? "Dashboard" : currentUser?.name || "My Profile"}
             </NavLink>
-            {currentUser?.role === "admin" && (
-              <button
-                className="navigation__button navigation__button_add-client"
-                onClick={onAddClient}
-              >
-                + Add Client
-              </button>
-            )}
             <button
               className="navigation__button navigation__button_logout"
               onClick={onLogout}
@@ -105,7 +97,9 @@ function Navigation({
                 className="navigation__mobile-link"
                 onClick={closeMobileMenu}
               >
-                {isProfilePage ? "Clients" : currentUser?.name || "My Profile"}
+                {isProfilePage
+                  ? "Dashboard"
+                  : currentUser?.name || "My Profile"}
               </NavLink>
               <button
                 className="navigation__mobile-button navigation__mobile-button_logout"

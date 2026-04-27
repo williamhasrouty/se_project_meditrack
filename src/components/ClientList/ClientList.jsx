@@ -12,6 +12,7 @@ function ClientList({
   currentUser,
   onAssignClient,
   onGetStaffUsers,
+  onAddClient,
 }) {
   const [visibleCount, setVisibleCount] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
@@ -176,7 +177,6 @@ function ClientList({
 
   return (
     <section className="client-list">
-      <h2 className="client-list__title">Your Clients</h2>
       <div className="client-list__search-container">
         <input
           type="text"
@@ -188,6 +188,11 @@ function ClientList({
             setVisibleCount(10); // Reset visible count when searching
           }}
         />
+        {isAdmin && onAddClient && (
+          <button className="client-list__add-button" onClick={onAddClient}>
+            + Add Client
+          </button>
+        )}
       </div>
       {filteredClients.length === 0 ? (
         <p className="client-list__empty">No clients match your search</p>

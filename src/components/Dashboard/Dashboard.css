@@ -1,0 +1,64 @@
+.dashboard {
+  width: 100%;
+}
+
+.dashboard__tabs {
+  display: flex;
+  gap: 8px;
+  padding: 0 20px;
+  max-width: 1000px;
+  margin: 0 auto 0;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.dashboard__tab {
+  padding: 16px 24px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Raleway", Arial, sans-serif;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 150ms ease-in-out;
+  position: relative;
+  bottom: -2px;
+}
+
+.dashboard__tab:hover {
+  color: #0284c7;
+  background: #f9fafb;
+}
+
+.dashboard__tab_active {
+  color: #0284c7;
+  border-bottom-color: #0284c7;
+}
+
+.dashboard__content {
+  width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+  .dashboard__tabs {
+    padding: 0 16px;
+  }
+
+  .dashboard__tab {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .dashboard__tabs {
+    gap: 4px;
+  }
+
+  .dashboard__tab {
+    padding: 12px;
+    font-size: 13px;
+    flex: 1;
+  }
+}

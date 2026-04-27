@@ -7,7 +7,7 @@ import Footer from "../Footer/Footer";
 import LoginModal from "../LoginModal/LoginModal";
 import RegisterModal from "../RegisterModal/RegisterModal";
 import MedicationLog from "../MedicationLog/MedicationLog";
-import ClientList from "../ClientList/ClientList";
+import Dashboard from "../Dashboard/Dashboard";
 import Profile from "../Profile/Profile";
 import EditProfileModal from "../EditProfileModal/EditProfileModal";
 import AddClientModal from "../AddClientModal/AddClientModal";
@@ -283,7 +283,7 @@ function App() {
               path="/"
               element={
                 isLoggedInDerived ? (
-                  <ClientList
+                  <Dashboard
                     clients={clients}
                     isLoading={isLoading}
                     error={dataError}
@@ -292,6 +292,7 @@ function App() {
                     currentUser={currentUser}
                     onAssignClient={handleAssignClient}
                     onGetStaffUsers={handleGetStaffUsers}
+                    onAddClient={handleAddClientClick}
                   />
                 ) : (
                   <div className="app__welcome">
@@ -314,18 +315,7 @@ function App() {
               }
             />
             <Route path="/medications" element={<MedicationLog />} />
-            <Route
-              path="/clients"
-              element={
-                <ClientList
-                  clients={clients}
-                  isLoading={isLoading}
-                  error={dataError}
-                  onEditClient={handleEditClientClick}
-                  onDeleteClient={handleDeleteClient}
-                />
-              }
-            />
+
             <Route
               path="/client/:clientId"
               element={
