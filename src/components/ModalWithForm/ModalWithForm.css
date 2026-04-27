@@ -31,7 +31,7 @@
   box-sizing: border-box;
   width: 100%;
   border-radius: 24px;
-  font-family: "Inter", Arial, sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.15),
     0 0 1px rgba(2, 132, 199, 0.1);
@@ -96,7 +96,7 @@
   width: 100%;
   margin-bottom: 24px;
   padding: 8px 0;
-  font-family: "Inter", Arial, sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
   transition: border-color 0.2s ease;
   background-color: transparent;
 }
@@ -140,7 +140,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: "Inter", Arial, sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
 }
 
 .modal__delete-btn:hover {
@@ -162,7 +162,7 @@
   padding: 14px 32px;
   font-size: 16px;
   font-weight: 600;
-  font-family: "Inter", Arial, sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
@@ -194,7 +194,7 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
-  font-family: "Inter", Arial, sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
   padding: 0;
   text-decoration: none;
   transition: color 0.2s ease;

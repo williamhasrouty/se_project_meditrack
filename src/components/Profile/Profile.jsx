@@ -7,6 +7,21 @@ import CurrentUserContext from "../../contexts/CurrentUserContext";
 function Profile({ onEditProfile, onLogout, clients }) {
   const currentUser = useContext(CurrentUserContext);
 
+  const getInitials = (name) => {
+    const nameParts = name.trim().split(" ");
+    if (nameParts.length >= 2) {
+      const firstName = nameParts[0];
+      const lastName = nameParts[nameParts.length - 1];
+      return (
+        firstName.charAt(0).toUpperCase() +
+        firstName.charAt(1).toLowerCase() +
+        lastName.charAt(0).toUpperCase() +
+        lastName.charAt(1).toLowerCase()
+      );
+    }
+    return name.charAt(0).toUpperCase();
+  };
+
   return (
     <div className="profile">
       <section className="profile__sidebar">
@@ -32,6 +47,17 @@ function Profile({ onEditProfile, onLogout, clients }) {
                     to={`/client/${client._id}`}
                     className="profile__client-link"
                   >
+                    <div className="profile__client-avatar">
+                      {client.imageUrl ? (
+                        <img
+                          src={client.imageUrl}
+                          alt={client.name}
+                          className="profile__client-avatar-image"
+                        />
+                      ) : (
+                        getInitials(client.name)
+                      )}
+                    </div>
                     <div className="profile__client-info">
                       <h4 className="profile__client-name">{client.name}</h4>
                       <p className="profile__client-meds">

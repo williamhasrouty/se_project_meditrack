@@ -28,7 +28,7 @@
   font-size: 16px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  font-family: "Inter", Arial, sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
   transition: all 150ms ease-in-out;
 }
 
@@ -94,7 +94,7 @@
   padding: 0 24px;
   background: none;
   border: none;
-  font-family: "Inter", Arial, sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
 }
 
 .client-list__header-cell--sortable {
@@ -192,6 +192,13 @@
   font-size: 16px;
   font-weight: 700;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.client-list__avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .client-list__name {
@@ -250,7 +257,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 150ms ease-in-out;
-  font-family: "Inter", Arial, sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
 }
 
 .client-list__edit-button:hover {
@@ -269,7 +276,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 150ms ease-in-out;
-  font-family: "Inter", Arial, sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
 }
 
 .client-list__delete-button:hover {
@@ -289,7 +296,7 @@
   width: 100%;
   padding: 8px 12px;
   font-size: 14px;
-  font-family: "Inter", Arial, sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   background: #ffffff;
@@ -336,7 +343,7 @@
   border-radius: 8px;
   cursor: pointer;
   transition: all 200ms ease-in-out;
-  font-family: "Inter", Arial, sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
 }
 
 .client-list__show-more:hover {

@@ -4,19 +4,21 @@ import ModalWithForm from "../ModalWithForm/ModalWithForm";
 function EditClientModal({ onClose, onEditClient, isOpen, client }) {
   const [name, setName] = useState("");
   const [region, setRegion] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (client) {
       setName(client.name || "");
       setRegion(client.region || "");
+      setImageUrl(client.imageUrl || "");
     }
   }, [client]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
-    onEditClient({ name, region })
+    onEditClient({ name, region, imageUrl })
       .then(() => {
         onClose();
       })
@@ -66,6 +68,17 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
           <option value="RCOC">RCOC</option>
           <option value="SDRC">SDRC</option>
         </select>
+      </label>
+      <label className="modal__label">
+        Photo URL (optional)
+        <input
+          type="url"
+          className="modal__input"
+          name="imageUrl"
+          placeholder="https://example.com/photo.jpg"
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
+        />
       </label>
     </ModalWithForm>
   );

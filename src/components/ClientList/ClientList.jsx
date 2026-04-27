@@ -235,7 +235,15 @@ function ClientList({
                   >
                     <div className="client-list__cell client-list__cell--name">
                       <div className="client-list__avatar">
-                        {getInitials(client.name)}
+                        {client.imageUrl ? (
+                          <img
+                            src={client.imageUrl}
+                            alt={client.name}
+                            className="client-list__avatar-image"
+                          />
+                        ) : (
+                          getInitials(client.name)
+                        )}
                       </div>
                       <span className="client-list__name">{client.name}</span>
                     </div>

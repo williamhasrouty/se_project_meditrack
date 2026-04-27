@@ -10,7 +10,7 @@
   top: 0;
   z-index: 100;
   backdrop-filter: blur(10px);
-  font-family: "Inter", Arial, sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
 }
 
 .header__left {
@@ -20,7 +20,7 @@
 }
 
 .header__logo {
-  font-size: 24px;
+  font-size: 30px;
   font-weight: 700;
   background: linear-gradient(135deg, #0284c7, #7dd3fc);
   -webkit-background-clip: text;

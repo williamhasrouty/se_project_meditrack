@@ -1,6 +1,6 @@
 .medication-log {
   padding: 16px;
-  font-family: "Inter", Arial, sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
   max-width: 100%;
 }
 
@@ -156,7 +156,7 @@
   border-radius: 4px;
   transition: all 0.2s ease;
   flex-shrink: 0;
-  font-family: "Inter", Arial, sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
 }
 
 .medication-log__edit-btn:hover {
