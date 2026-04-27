@@ -7,12 +7,6 @@ import CurrentUserContext from "../../contexts/CurrentUserContext";
 function Profile({ onEditProfile, onLogout, clients }) {
   const currentUser = useContext(CurrentUserContext);
 
-  const totalClients = clients.length;
-  const totalMedications = clients.reduce(
-    (sum, client) => sum + client.medications.length,
-    0
-  );
-
   return (
     <div className="profile">
       <section className="profile__sidebar">
@@ -25,19 +19,8 @@ function Profile({ onEditProfile, onLogout, clients }) {
       <section className="profile__content">
         <h2 className="profile__title">Profile Overview</h2>
         <p className="profile__description">
-          Manage your account information and view your client statistics.
+          Manage your account information and view your clients.
         </p>
-
-        <div className="profile__stats">
-          <div className="profile__stat-card">
-            <h3 className="profile__stat-number">{totalClients}</h3>
-            <p className="profile__stat-label">Total Clients</p>
-          </div>
-          <div className="profile__stat-card">
-            <h3 className="profile__stat-number">{totalMedications}</h3>
-            <p className="profile__stat-label">Total Medications</p>
-          </div>
-        </div>
 
         {clients.length > 0 && (
           <div className="profile__clients">
