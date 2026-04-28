@@ -41,7 +41,7 @@ function MedicationLog({
   const [editingMedication, setEditingMedication] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [isProfileExpanded, setIsProfileExpanded] = useState(true);
+  const [isProfileExpanded, setIsProfileExpanded] = useState(false);
   const saveTimeoutRef = useRef(null);
   const menuRef = useRef(null);
 

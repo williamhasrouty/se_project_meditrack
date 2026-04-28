@@ -67,7 +67,7 @@
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .client-list__header-row {
@@ -126,6 +126,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  overflow: visible;
 }
 
 .client-list__row {
@@ -133,6 +134,8 @@
   grid-template-columns: 1fr 150px;
   border-bottom: 1px solid #e5e7eb;
   transition: background-color 150ms ease-in-out;
+  position: relative;
+  overflow: visible;
 }
 
 .client-list__row:has(.client-list__cell--assign) {
@@ -157,6 +160,7 @@
   color: inherit;
   cursor: pointer;
   transition: opacity 150ms ease-in-out;
+  overflow: visible;
 }
 
 .client-list__link:hover {
@@ -293,12 +297,83 @@
   align-items: center;
   justify-content: center;
   padding: 0 16px;
+  overflow: visible;
+}
+
+.client-list__staff-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  overflow: visible;
+}
+
+.client-list__staff-summary {
+  position: relative;
+  overflow: visible;
+}
+
+.client-list__staff-count {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #0284c7, #7dd3fc);
+  color: #ffffff;
+  border-radius: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.client-list__staff-count:hover {
+  background: linear-gradient(135deg, #0369a1, #0ea5e9);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.2);
+}
+
+.client-list__staff-badges {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  padding: 8px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 200px;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.client-list__staff-summary:hover .client-list__staff-badges {
+  display: flex;
+}
+
+.client-list__staff-badge {
+  display: block;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #f3f4f6;
+  color: #1f2937;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.client-list__unassigned {
+  font-size: 14px;
+  color: #9ca3af;
+  font-style: italic;
 }
 
 .client-list__assign-select {
   width: 100%;
-  padding: 8px 12px;
-  font-size: 14px;
+  padding: 6px 10px;
+  font-size: 12px;
   font-family: "Raleway", Arial, sans-serif;
   border: 1px solid #d1d5db;
   border-radius: 6px;
