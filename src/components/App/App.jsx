@@ -324,6 +324,8 @@ function App() {
                     clients={clients}
                     currentUser={currentUser}
                     refreshClients={refreshClients}
+                    onEditClient={handleEditClientClick}
+                    onDeleteClient={handleDeleteClient}
                   />
                 </ProtectedRoute>
               }

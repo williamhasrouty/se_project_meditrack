@@ -15,13 +15,21 @@ import {
 import AddMedicationModal from "../AddMedicationModal/AddMedicationModal";
 import EditMedicationModal from "../EditMedicationModal/EditMedicationModal";
 
-function MedicationLog({ clients, currentUser, refreshClients }) {
+function MedicationLog({
+  clients,
+  currentUser,
+  refreshClients,
+  onEditClient,
+  onDeleteClient,
+}) {
   const { clientId } = useParams();
   const client = clients?.find((c) => c._id === clientId);
   const currentDate = new Date();
-  const currentMonth = currentDate.getMonth();
-  const currentYear = currentDate.getFullYear();
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+  // State for selected month/year (defaults to current month)
+  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+  const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
 
   const [administrations, setAdministrations] = useState({});
   const [selectedMedication, setSelectedMedication] = useState(null);
@@ -31,17 +39,86 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
     useState(true);
   const [activeModal, setActiveModal] = useState(null);
   const [editingMedication, setEditingMedication] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [isProfileExpanded, setIsProfileExpanded] = useState(true);
   const saveTimeoutRef = useRef(null);
+  const menuRef = useRef(null);
 
   const isAdmin = currentUser?.role === "admin";
 
-  // Load administrations from API on mount
+  // Toggle profile expansion
+  const toggleProfile = () => {
+    setIsProfileExpanded(!isProfileExpanded);
+  };
+
+  // Month navigation functions
+  const handlePreviousMonth = () => {
+    if (selectedMonth === 0) {
+      setSelectedMonth(11);
+      setSelectedYear(selectedYear - 1);
+    } else {
+      setSelectedMonth(selectedMonth - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (selectedMonth === 11) {
+      setSelectedMonth(0);
+      setSelectedYear(selectedYear + 1);
+    } else {
+      setSelectedMonth(selectedMonth + 1);
+    }
+  };
+
+  const handleCurrentMonth = () => {
+    setSelectedMonth(currentDate.getMonth());
+    setSelectedYear(currentDate.getFullYear());
+  };
+
+  const isCurrentMonth =
+    selectedMonth === currentDate.getMonth() &&
+    selectedYear === currentDate.getFullYear();
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const monthName = monthNames[selectedMonth];
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [isMenuOpen]);
+
+  // Load administrations from API on mount and when month/year changes
   useEffect(() => {
     const token = localStorage.getItem("jwt");
     if (!token || !clientId) return;
 
     setIsLoadingAdministrations(true);
-    getMedicationAdministrations(clientId, currentMonth, currentYear, token)
+    getMedicationAdministrations(clientId, selectedMonth, selectedYear, token)
       .then((data) => {
         setAdministrations(data.records || {});
         setIsLoadingAdministrations(false);
@@ -50,7 +127,7 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
         console.error("Error loading administrations:", error);
         setIsLoadingAdministrations(false);
       });
-  }, [clientId, currentMonth, currentYear]);
+  }, [clientId, selectedMonth, selectedYear]);
 
   // Save administrations to API whenever they change (with debounce)
   useEffect(() => {
@@ -94,8 +171,8 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
         saveMedicationAdministration(
           {
             clientId,
-            month: currentMonth,
-            year: currentYear,
+            month: selectedMonth,
+            year: selectedYear,
             medicationId,
             records,
           },
@@ -115,8 +192,8 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
   }, [
     administrations,
     clientId,
-    currentMonth,
-    currentYear,
+    selectedMonth,
+    selectedYear,
     isLoadingAdministrations,
   ]);
 
@@ -244,12 +321,23 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
     setEditingMedication(null);
   };
 
-  const monthName = new Date(currentYear, currentMonth).toLocaleString(
-    "default",
-    {
-      month: "long",
-    },
-  );
+  const getInitials = (name) => {
+    const names = name.split(" ");
+    if (names.length === 1) return names[0].charAt(0).toUpperCase();
+    return (
+      names[0].charAt(0) + names[names.length - 1].charAt(0)
+    ).toUpperCase();
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "Not provided";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    });
+  };
 
   return (
     <section className="medication-log">
@@ -261,18 +349,248 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
           <div>
             <h1 className="medication-log__title">{client.name}</h1>
             <h2 className="medication-log__subtitle">
-              Medication Administration Record - {monthName} {currentYear}
+              Medication Administration Record - {monthName} {selectedYear}
             </h2>
           </div>
           {isAdmin && (
-            <button
-              className="medication-log__add-btn"
-              onClick={openAddMedicationModal}
+            <div className="medication-log__menu-wrapper" ref={menuRef}>
+              <button
+                className="medication-log__menu-btn"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label="Actions menu"
+              >
+                <span className="medication-log__menu-icon"></span>
+                <span className="medication-log__menu-icon"></span>
+                <span className="medication-log__menu-icon"></span>
+              </button>
+              {isMenuOpen && (
+                <div className="medication-log__dropdown">
+                  <button
+                    className="medication-log__dropdown-item medication-log__dropdown-item--add"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      openAddMedicationModal();
+                    }}
+                  >
+                    <span className="medication-log__dropdown-icon">+</span>
+                    Add Medication
+                  </button>
+                  <button
+                    className="medication-log__dropdown-item medication-log__dropdown-item--edit"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      onEditClient(client);
+                    }}
+                  >
+                    <span className="medication-log__dropdown-icon">✎</span>
+                    Edit Client
+                  </button>
+                  <button
+                    className="medication-log__dropdown-item medication-log__dropdown-item--delete"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      setShowDeleteConfirmation(true);
+                    }}
+                  >
+                    <span className="medication-log__dropdown-icon">🗑</span>
+                    Delete Client
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Client Profile Section */}
+      <div className="medication-log__profile">
+        <div
+          className="medication-log__profile-header"
+          onClick={toggleProfile}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              toggleProfile();
+            }
+          }}
+        >
+          <div className="medication-log__profile-avatar">
+            {client.imageUrl ? (
+              <img
+                src={client.imageUrl}
+                alt={client.name}
+                className="medication-log__profile-avatar-image"
+              />
+            ) : (
+              <div className="medication-log__profile-avatar-initials">
+                {getInitials(client.name)}
+              </div>
+            )}
+          </div>
+          <div className="medication-log__profile-header-info">
+            <h3 className="medication-log__profile-name">{client.name}</h3>
+            <span
+              className={`medication-log__profile-status ${
+                client.isActive
+                  ? "medication-log__profile-status--active"
+                  : "medication-log__profile-status--inactive"
+              }`}
             >
-              + Add Medication
+              {client.isActive ? "Active" : "Inactive"}
+            </span>
+          </div>
+          <div
+            className={`medication-log__profile-chevron ${
+              isProfileExpanded
+                ? "medication-log__profile-chevron--expanded"
+                : ""
+            }`}
+          >
+            ▼
+          </div>
+        </div>
+
+        <div
+          className={`medication-log__profile-body ${
+            isProfileExpanded ? "medication-log__profile-body--visible" : ""
+          }`}
+        >
+          <div className="medication-log__profile-section">
+            <h4 className="medication-log__profile-section-title">
+              Personal Information
+            </h4>
+            <div className="medication-log__profile-grid">
+              <div className="medication-log__profile-field">
+                <span className="medication-log__profile-label">
+                  Date of Birth:
+                </span>
+                <span className="medication-log__profile-value">
+                  {formatDate(client.dateOfBirth)}
+                </span>
+              </div>
+              <div className="medication-log__profile-field">
+                <span className="medication-log__profile-label">Region:</span>
+                <span className="medication-log__profile-value">
+                  {client.region}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {(client.allergies || client.diagnoses) && (
+            <div className="medication-log__profile-section">
+              <h4 className="medication-log__profile-section-title">
+                Medical Information
+              </h4>
+              {client.allergies && (
+                <div className="medication-log__profile-field medication-log__profile-field--full">
+                  <span className="medication-log__profile-label">
+                    Allergies:
+                  </span>
+                  <span className="medication-log__profile-value">
+                    {client.allergies}
+                  </span>
+                </div>
+              )}
+              {client.diagnoses && (
+                <div className="medication-log__profile-field medication-log__profile-field--full">
+                  <span className="medication-log__profile-label">
+                    Diagnoses / Conditions:
+                  </span>
+                  <span className="medication-log__profile-value">
+                    {client.diagnoses}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {(client.prescribingPhysician || client.pharmacyInfo) && (
+            <div className="medication-log__profile-section">
+              <h4 className="medication-log__profile-section-title">
+                Healthcare Providers
+              </h4>
+              {client.prescribingPhysician && (
+                <div className="medication-log__profile-field medication-log__profile-field--full">
+                  <span className="medication-log__profile-label">
+                    Prescribing Physician:
+                  </span>
+                  <span className="medication-log__profile-value">
+                    {client.prescribingPhysician}
+                  </span>
+                </div>
+              )}
+              {client.pharmacyInfo && (
+                <div className="medication-log__profile-field medication-log__profile-field--full">
+                  <span className="medication-log__profile-label">
+                    Pharmacy Information:
+                  </span>
+                  <span className="medication-log__profile-value">
+                    {client.pharmacyInfo}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {client.emergencyContacts && (
+            <div className="medication-log__profile-section">
+              <h4 className="medication-log__profile-section-title">
+                Emergency Contacts
+              </h4>
+              <div className="medication-log__profile-field medication-log__profile-field--full">
+                <span className="medication-log__profile-value">
+                  {client.emergencyContacts}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {client.notes && (
+            <div className="medication-log__profile-section">
+              <h4 className="medication-log__profile-section-title">Notes</h4>
+              <div className="medication-log__profile-field medication-log__profile-field--full">
+                <span className="medication-log__profile-value medication-log__profile-value--notes">
+                  {client.notes}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Month Navigation */}
+      <div className="medication-log__month-nav">
+        <button
+          className="medication-log__month-btn"
+          onClick={handlePreviousMonth}
+          aria-label="Previous month"
+        >
+          ‹
+        </button>
+        <div className="medication-log__month-display">
+          <span className="medication-log__month-name">
+            {monthName} {selectedYear}
+          </span>
+          {!isCurrentMonth && (
+            <button
+              className="medication-log__current-month-btn"
+              onClick={handleCurrentMonth}
+              title="Go to current month"
+            >
+              Today
             </button>
           )}
         </div>
+        <button
+          className="medication-log__month-btn"
+          onClick={handleNextMonth}
+          aria-label="Next month"
+        >
+          ›
+        </button>
       </div>
 
       <div className="medication-log__table-container">
@@ -437,6 +755,57 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
         onDeleteMedication={handleDeleteMedication}
         medication={editingMedication}
       />
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirmation && (
+        <div
+          className="confirmation-modal"
+          onClick={() => setShowDeleteConfirmation(false)}
+        >
+          <div
+            className="confirmation-modal__content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="confirmation-modal__close"
+              onClick={() => setShowDeleteConfirmation(false)}
+            >
+              ×
+            </button>
+            <div className="confirmation-modal__icon confirmation-modal__icon--warning">
+              ⚠️
+            </div>
+            <h2 className="confirmation-modal__title">Delete Client?</h2>
+            <p className="confirmation-modal__message">
+              Are you sure you want to delete <strong>{client.name}</strong>?
+              This will permanently delete all their medications and
+              administration records.
+            </p>
+            <p className="confirmation-modal__warning">
+              This action cannot be undone.
+            </p>
+            <div className="confirmation-modal__actions">
+              <button
+                className="confirmation-modal__btn confirmation-modal__btn--cancel"
+                onClick={() => setShowDeleteConfirmation(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="confirmation-modal__btn confirmation-modal__btn--delete"
+                onClick={() => {
+                  setShowDeleteConfirmation(false);
+                  onDeleteClient(client._id).then(() => {
+                    window.location.href = "/";
+                  });
+                }}
+              >
+                Delete Client
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

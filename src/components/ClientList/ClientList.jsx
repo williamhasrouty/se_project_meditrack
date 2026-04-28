@@ -291,7 +291,7 @@ function ClientList({
                       >
                         Edit
                       </button>
-                      <button
+                      {/* <button
                         className="client-list__delete-button"
                         onClick={(e) => {
                           e.preventDefault();
@@ -300,7 +300,7 @@ function ClientList({
                         aria-label="Delete client"
                       >
                         Delete
-                      </button>
+                      </button> */}
                     </div>
                   )}
                 </li>
