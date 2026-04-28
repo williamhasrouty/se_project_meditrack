@@ -22,16 +22,19 @@
 
 .medication-log__menu-btn {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 40px;
-  height: 40px;
-  padding: 8px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
   background: linear-gradient(135deg, #0284c7, #7dd3fc);
   border: none;
   border-radius: 8px;
+  color: white;
+  font-family: "Raleway", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .medication-log__menu-btn:hover {
@@ -44,12 +47,13 @@
   transform: scale(0.98);
 }
 
-.medication-log__menu-icon {
-  width: 100%;
-  height: 3px;
-  background: white;
-  border-radius: 2px;
-  transition: all 0.2s ease;
+.medication-log__menu-arrow {
+  font-size: 10px;
+  transition: transform 0.2s ease;
+}
+
+.medication-log__menu-btn--open .medication-log__menu-arrow {
+  transform: rotate(180deg);
 }
 
 .medication-log__dropdown {
@@ -552,6 +556,7 @@
   color: #0284c7;
   min-height: 30px;
   font-size: 11px;
+  position: relative;
 }
 
 .medication-log__td_cell:hover {
@@ -561,6 +566,48 @@
 
 .medication-log__td_cell:active {
   background-color: #e0f2fe;
+}
+
+.medication-log__cell-content {
+  position: relative;
+  display: inline-block;
+}
+
+.medication-log__cell-initials {
+  cursor: pointer;
+}
+
+.medication-log__cell-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  background: #1f2937;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.medication-log__cell-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1f2937;
+}
+
+.medication-log__cell-content:hover .medication-log__cell-tooltip {
+  opacity: 1;
 }
 
 .medication-log__footer {

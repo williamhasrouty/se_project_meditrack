@@ -11,6 +11,7 @@ import {
   addMedication,
   updateMedication,
   deleteMedication,
+  getStaffUsers,
 } from "../../utils/api";
 import AddMedicationModal from "../AddMedicationModal/AddMedicationModal";
 import EditMedicationModal from "../EditMedicationModal/EditMedicationModal";
@@ -32,6 +33,7 @@ function MedicationLog({
   const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
 
   const [administrations, setAdministrations] = useState({});
+  const [staffUsers, setStaffUsers] = useState([]);
   const [selectedMedication, setSelectedMedication] = useState(null);
   const [medicationInfo, setMedicationInfo] = useState(null);
   const [isLoadingInfo, setIsLoadingInfo] = useState(false);
@@ -46,6 +48,45 @@ function MedicationLog({
   const menuRef = useRef(null);
 
   const isAdmin = currentUser?.role === "admin";
+
+  // Create initials to name mapping
+  const initialsToName = {};
+  if (currentUser?.name) {
+    const userInitials =
+      currentUser.initials ||
+      currentUser.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase();
+    if (userInitials) {
+      initialsToName[userInitials] = currentUser.name;
+    }
+  }
+  staffUsers.forEach((user) => {
+    if (user?.name) {
+      const initials =
+        user.initials ||
+        user.name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase();
+      if (initials) {
+        initialsToName[initials] = user.name;
+      }
+    }
+  });
+
+  // Fetch staff users for initials-to-name mapping
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      getStaffUsers(token)
+        .then((users) => setStaffUsers(users))
+        .catch((err) => console.error("Failed to fetch staff users:", err));
+    }
+  }, []);
 
   // Toggle profile expansion
   const toggleProfile = () => {
@@ -355,13 +396,14 @@ function MedicationLog({
           {isAdmin && (
             <div className="medication-log__menu-wrapper" ref={menuRef}>
               <button
-                className="medication-log__menu-btn"
+                className={`medication-log__menu-btn ${
+                  isMenuOpen ? "medication-log__menu-btn--open" : ""
+                }`}
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-label="Actions menu"
               >
-                <span className="medication-log__menu-icon"></span>
-                <span className="medication-log__menu-icon"></span>
-                <span className="medication-log__menu-icon"></span>
+                Actions
+                <span className="medication-log__menu-arrow">▼</span>
               </button>
               {isMenuOpen && (
                 <div className="medication-log__dropdown">
@@ -649,6 +691,8 @@ function MedicationLog({
                   {Array.from({ length: daysInMonth }, (_, i) => {
                     const day = i + 1;
                     const key = `${medication._id}-${day}-${time}`;
+                    const cellValue = administrations[key] || "";
+                    const staffName = cellValue && initialsToName[cellValue];
                     return (
                       <td
                         key={day}
@@ -657,7 +701,18 @@ function MedicationLog({
                           handleCellClick(medication._id, day, time)
                         }
                       >
-                        {administrations[key] || ""}
+                        {cellValue && (
+                          <div className="medication-log__cell-content">
+                            <span className="medication-log__cell-initials">
+                              {cellValue}
+                            </span>
+                            {staffName && currentUser?.role === "admin" && (
+                              <div className="medication-log__cell-tooltip">
+                                {staffName}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </td>
                     );
                   })}
