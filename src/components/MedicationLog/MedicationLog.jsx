@@ -12,9 +12,13 @@ import {
   updateMedication,
   deleteMedication,
   getStaffUsers,
+  getPRNAdministrations,
+  createPRNAdministration,
+  deletePRNAdministration,
 } from "../../utils/api";
 import AddMedicationModal from "../AddMedicationModal/AddMedicationModal";
 import EditMedicationModal from "../EditMedicationModal/EditMedicationModal";
+import AddPRNAdministrationModal from "../AddPRNAdministrationModal/AddPRNAdministrationModal";
 
 function MedicationLog({
   clients,
@@ -34,6 +38,8 @@ function MedicationLog({
 
   const [administrations, setAdministrations] = useState({});
   const [staffUsers, setStaffUsers] = useState([]);
+  const [prnAdministrations, setPrnAdministrations] = useState([]);
+  const [selectedPRNMedication, setSelectedPRNMedication] = useState(null);
   const [selectedMedication, setSelectedMedication] = useState(null);
   const [medicationInfo, setMedicationInfo] = useState(null);
   const [isLoadingInfo, setIsLoadingInfo] = useState(false);
@@ -87,6 +93,19 @@ function MedicationLog({
         .catch((err) => console.error("Failed to fetch staff users:", err));
     }
   }, []);
+
+  // Fetch PRN administrations
+  useEffect(() => {
+    if (!clientId) return;
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      getPRNAdministrations(clientId, token)
+        .then((admins) => setPrnAdministrations(admins))
+        .catch((err) =>
+          console.error("Failed to fetch PRN administrations:", err),
+        );
+    }
+  }, [clientId]);
 
   // Toggle profile expansion
   const toggleProfile = () => {
@@ -348,6 +367,32 @@ function MedicationLog({
     });
   };
 
+  // PRN Handlers
+  const handleAddPRNAdministration = (data) => {
+    const token = localStorage.getItem("jwt");
+    if (!token) return Promise.reject(new Error("No token"));
+
+    return createPRNAdministration({ ...data, clientId }, token).then(
+      (newAdmin) => {
+        setPrnAdministrations((prev) => [newAdmin, ...prev]);
+      },
+    );
+  };
+
+  const handleDeletePRNAdministration = (id) => {
+    const token = localStorage.getItem("jwt");
+    if (!token) return Promise.reject(new Error("No token"));
+
+    return deletePRNAdministration(id, token).then(() => {
+      setPrnAdministrations((prev) => prev.filter((admin) => admin._id !== id));
+    });
+  };
+
+  const openPRNModal = (medication) => {
+    setSelectedPRNMedication(medication);
+    setActiveModal("add-prn");
+  };
+
   const openAddMedicationModal = () => {
     setActiveModal("add-medication");
   };
@@ -360,6 +405,7 @@ function MedicationLog({
   const closeModal = () => {
     setActiveModal(null);
     setEditingMedication(null);
+    setSelectedPRNMedication(null);
   };
 
   const getInitials = (name) => {
@@ -380,6 +426,11 @@ function MedicationLog({
     });
   };
 
+  // Filter medications into scheduled and PRN
+  const scheduledMedications =
+    client?.medications?.filter((med) => !med.isPRN) || [];
+  const prnMedications = client?.medications?.filter((med) => med.isPRN) || [];
+
   return (
     <section className="medication-log">
       <div className="medication-log__header">
@@ -387,12 +438,12 @@ function MedicationLog({
           ← Back to Client List
         </Link>
         <div className="medication-log__header-content">
-          <div>
+          {/* <div>
             <h1 className="medication-log__title">{client.name}</h1>
-            <h2 className="medication-log__subtitle">
+          </div> */}
+           <h2 className="medication-log__subtitle">
               Medication Administration Record - {monthName} {selectedYear}
             </h2>
-          </div>
           {isAdmin && (
             <div className="medication-log__menu-wrapper" ref={menuRef}>
               <button
@@ -473,6 +524,7 @@ function MedicationLog({
           </div>
           <div className="medication-log__profile-header-info">
             <h3 className="medication-log__profile-name">{client.name}</h3>
+           
             <span
               className={`medication-log__profile-status ${
                 client.isActive
@@ -656,7 +708,7 @@ function MedicationLog({
             </tr>
           </thead>
           <tbody>
-            {client.medications.map((medication) =>
+            {scheduledMedications.map((medication) =>
               medication.times.map((time, timeIndex) => (
                 <tr
                   key={`${medication._id}-${time}`}
@@ -729,6 +781,126 @@ function MedicationLog({
           initials for medication administration.
         </p>
       </div>
+
+      {/* PRN / As-Needed Medications Section */}
+      {prnMedications.length > 0 && (
+        <div className="medication-log__prn-section">
+          <h3 className="medication-log__prn-title">
+            PRN / As-Needed Medications
+          </h3>
+          <div className="medication-log__prn-medications">
+            {prnMedications.map((medication) => {
+              const medicationAdmins = prnAdministrations.filter(
+                (admin) => admin.medicationId === medication._id,
+              );
+              const recentAdmins = medicationAdmins.slice(0, 5);
+
+              return (
+                <div key={medication._id} className="medication-log__prn-card">
+                  <div className="medication-log__prn-header">
+                    <div className="medication-log__prn-name-wrapper">
+                      <h4 className="medication-log__prn-medication-name">
+                        {medication.name}
+                      </h4>
+                      {isAdmin && (
+                        <button
+                          className="medication-log__prn-edit-btn"
+                          onClick={() => openEditMedicationModal(medication)}
+                          title="Edit medication"
+                        >
+                          ✎
+                        </button>
+                      )}
+                      <button
+                        className="medication-log__prn-give-btn"
+                        onClick={() => openPRNModal(medication)}
+                      >
+                        + Give Medication
+                      </button>
+                    </div>
+                    {medication.directions && (
+                      <div className="medication-log__prn-directions">
+                        <strong>Directions:</strong>
+                        <p>{medication.directions}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="medication-log__prn-history">
+                    <h5 className="medication-log__prn-history-title">
+                      Recent Administrations
+                    </h5>
+                    {recentAdmins.length > 0 ? (
+                      <>
+                        <ul className="medication-log__prn-list">
+                          {recentAdmins.map((admin) => (
+                            <li
+                              key={admin._id}
+                              className="medication-log__prn-item"
+                            >
+                              <div className="medication-log__prn-item-main">
+                                <span className="medication-log__prn-date">
+                                  {new Date(
+                                    admin.administeredAt,
+                                  ).toLocaleString("en-US", {
+                                    month: "numeric",
+                                    day: "numeric",
+                                    year: "numeric",
+                                    hour: "numeric",
+                                    minute: "2-digit",
+                                  })}
+                                </span>
+                                <span className="medication-log__prn-staff">
+                                  By: {admin.staffInitials}
+                                </span>
+                                <span className="medication-log__prn-reason">
+                                  Reason: {admin.reason}
+                                </span>
+                              </div>
+                              {admin.notes && (
+                                <p className="medication-log__prn-notes">
+                                  {admin.notes}
+                                </p>
+                              )}
+                              {isAdmin && (
+                                <button
+                                  className="medication-log__prn-delete-btn"
+                                  onClick={() => {
+                                    if (
+                                      window.confirm(
+                                        "Delete this administration record?",
+                                      )
+                                    ) {
+                                      handleDeletePRNAdministration(admin._id);
+                                    }
+                                  }}
+                                  title="Delete record"
+                                >
+                                  ×
+                                </button>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                        {medicationAdmins.length > 5 && (
+                          <p className="medication-log__prn-more">
+                            + {medicationAdmins.length - 5} more administration
+                            {medicationAdmins.length - 5 !== 1 ? "s" : ""}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <p className="medication-log__prn-empty">
+                        No administrations recorded yet
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {selectedMedication && (
         <div className="medication-modal" onClick={closeMedicationModal}>
@@ -809,6 +981,13 @@ function MedicationLog({
         onEditMedication={handleEditMedication}
         onDeleteMedication={handleDeleteMedication}
         medication={editingMedication}
+      />
+
+      <AddPRNAdministrationModal
+        isOpen={activeModal === "add-prn"}
+        onClose={closeModal}
+        onAddPRN={handleAddPRNAdministration}
+        medication={selectedPRNMedication}
       />
 
       {/* Delete Confirmation Modal */}

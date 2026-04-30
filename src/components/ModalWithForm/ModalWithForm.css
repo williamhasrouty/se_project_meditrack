@@ -238,6 +238,32 @@
   text-decoration: underline;
 }
 
+.modal__info-box {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-left: 4px solid #0284c7;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  color: #1e40af;
+}
+
+.modal__info-box strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #1e3a8a;
+}
+
+.modal__info-box p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1e40af;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
 @media screen and (max-width: 768px) {
   .modal__content {
     max-width: 95%;

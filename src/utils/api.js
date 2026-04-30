@@ -169,6 +169,40 @@ function getStaffUsers(token) {
   }).then(handleResponse);
 }
 
+// Get PRN administrations for a client
+function getPRNAdministrations(clientId, token) {
+  return fetch(`${BASE_URL}/prn-administrations/${clientId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(handleResponse);
+}
+
+// Create a PRN administration
+function createPRNAdministration(data, token) {
+  return fetch(`${BASE_URL}/prn-administrations`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  }).then(handleResponse);
+}
+
+// Delete a PRN administration
+function deletePRNAdministration(id, token) {
+  return fetch(`${BASE_URL}/prn-administrations/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(handleResponse);
+}
+
 export {
   getClients,
   getClientById,
@@ -182,4 +216,7 @@ export {
   getMedicationAdministrations,
   assignClient,
   getStaffUsers,
+  getPRNAdministrations,
+  createPRNAdministration,
+  deletePRNAdministration,
 };
