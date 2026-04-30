@@ -441,9 +441,9 @@ function MedicationLog({
           {/* <div>
             <h1 className="medication-log__title">{client.name}</h1>
           </div> */}
-           <h2 className="medication-log__subtitle">
-              Medication Administration Record - {monthName} {selectedYear}
-            </h2>
+          <h2 className="medication-log__subtitle">
+            Medication Administration Record - {monthName} {selectedYear}
+          </h2>
           {isAdmin && (
             <div className="medication-log__menu-wrapper" ref={menuRef}>
               <button
@@ -524,7 +524,7 @@ function MedicationLog({
           </div>
           <div className="medication-log__profile-header-info">
             <h3 className="medication-log__profile-name">{client.name}</h3>
-           
+
             <span
               className={`medication-log__profile-status ${
                 client.isActive
@@ -771,100 +771,101 @@ function MedicationLog({
                 </tr>
               )),
             )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="medication-log__footer">
-        <p className="medication-log__instructions">
-          Click on medication name for details. Click on any cell to add your
-          initials for medication administration.
-        </p>
-      </div>
-
-      {/* PRN / As-Needed Medications Section */}
-      {prnMedications.length > 0 && (
-        <div className="medication-log__prn-section">
-          <h3 className="medication-log__prn-title">
-            PRN / As-Needed Medications
-          </h3>
-          <div className="medication-log__prn-medications">
+            {prnMedications.length > 0 && (
+              <tr className="medication-log__prn-separator-row">
+                <td
+                  colSpan={daysInMonth + 2}
+                  className="medication-log__prn-separator-cell"
+                >
+                  PRN / As-Needed Medications
+                </td>
+              </tr>
+            )}
             {prnMedications.map((medication) => {
-              const medicationAdmins = prnAdministrations.filter(
-                (admin) => admin.medicationId === medication._id,
-              );
-              const recentAdmins = medicationAdmins.slice(0, 5);
+              const adminsForMonth = prnAdministrations
+                .filter((admin) => {
+                  const d = new Date(admin.administeredAt);
+                  return (
+                    admin.medicationId === medication._id &&
+                    d.getMonth() === selectedMonth &&
+                    d.getFullYear() === selectedYear
+                  );
+                })
+                .sort(
+                  (a, b) =>
+                    new Date(a.administeredAt) - new Date(b.administeredAt),
+                );
 
               return (
-                <div key={medication._id} className="medication-log__prn-card">
-                  <div className="medication-log__prn-header">
-                    <div className="medication-log__prn-name-wrapper">
-                      <h4 className="medication-log__prn-medication-name">
+                <tr
+                  key={medication._id}
+                  className="medication-log__row medication-log__row--prn"
+                >
+                  <td className="medication-log__medication-cell">
+                    <div className="medication-log__medication-content">
+                      <span className="medication-log__medication-name">
                         {medication.name}
-                      </h4>
+                      </span>
                       {isAdmin && (
                         <button
-                          className="medication-log__prn-edit-btn"
+                          className="medication-log__edit-btn"
                           onClick={() => openEditMedicationModal(medication)}
-                          title="Edit medication"
+                          aria-label="Edit medication"
                         >
-                          ✎
+                          Edit
                         </button>
                       )}
                       <button
-                        className="medication-log__prn-give-btn"
+                        className="medication-log__prn-give-btn medication-log__prn-give-btn--inline"
                         onClick={() => openPRNModal(medication)}
                       >
-                        + Give Medication
+                        +
                       </button>
                     </div>
-                    {medication.directions && (
-                      <div className="medication-log__prn-directions">
-                        <strong>Directions:</strong>
-                        <p>{medication.directions}</p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="medication-log__prn-history">
-                    <h5 className="medication-log__prn-history-title">
-                      Recent Administrations
-                    </h5>
-                    {recentAdmins.length > 0 ? (
-                      <>
-                        <ul className="medication-log__prn-list">
-                          {recentAdmins.map((admin) => (
+                  </td>
+                  <td
+                    className="medication-log__td medication-log__td_cell--prn-log"
+                    colSpan={daysInMonth + 1}
+                  >
+                    {adminsForMonth.length === 0 ? (
+                      <span className="medication-log__prn-log-empty">
+                        No administrations this month
+                      </span>
+                    ) : (
+                      <ul className="medication-log__prn-log-list">
+                        {adminsForMonth.map((admin) => {
+                          const d = new Date(admin.administeredAt);
+                          return (
                             <li
                               key={admin._id}
-                              className="medication-log__prn-item"
+                              className="medication-log__prn-log-entry"
                             >
-                              <div className="medication-log__prn-item-main">
-                                <span className="medication-log__prn-date">
-                                  {new Date(
-                                    admin.administeredAt,
-                                  ).toLocaleString("en-US", {
-                                    month: "numeric",
-                                    day: "numeric",
-                                    year: "numeric",
-                                    hour: "numeric",
-                                    minute: "2-digit",
-                                  })}
-                                </span>
-                                <span className="medication-log__prn-staff">
-                                  By: {admin.staffInitials}
-                                </span>
-                                <span className="medication-log__prn-reason">
-                                  Reason: {admin.reason}
-                                </span>
-                              </div>
+                              <span className="medication-log__prn-log-date">
+                                {d.toLocaleDateString("en-US", {
+                                  month: "numeric",
+                                  day: "numeric",
+                                })}
+                              </span>
+                              <span className="medication-log__prn-log-time">
+                                {d.toLocaleTimeString("en-US", {
+                                  hour: "numeric",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                              <span className="medication-log__prn-log-reason">
+                                {admin.reason}
+                              </span>
+                              <span className="medication-log__prn-log-staff">
+                                {admin.staffInitials}
+                              </span>
                               {admin.notes && (
-                                <p className="medication-log__prn-notes">
+                                <span className="medication-log__prn-log-notes">
                                   {admin.notes}
-                                </p>
+                                </span>
                               )}
                               {isAdmin && (
                                 <button
-                                  className="medication-log__prn-delete-btn"
+                                  className="medication-log__prn-log-delete"
                                   onClick={() => {
                                     if (
                                       window.confirm(
@@ -880,27 +881,24 @@ function MedicationLog({
                                 </button>
                               )}
                             </li>
-                          ))}
-                        </ul>
-                        {medicationAdmins.length > 5 && (
-                          <p className="medication-log__prn-more">
-                            + {medicationAdmins.length - 5} more administration
-                            {medicationAdmins.length - 5 !== 1 ? "s" : ""}
-                          </p>
-                        )}
-                      </>
-                    ) : (
-                      <p className="medication-log__prn-empty">
-                        No administrations recorded yet
-                      </p>
+                          );
+                        })}
+                      </ul>
                     )}
-                  </div>
-                </div>
+                  </td>
+                </tr>
               );
             })}
-          </div>
-        </div>
-      )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="medication-log__footer">
+        <p className="medication-log__instructions">
+          Click on medication name for details. Click on any cell to add your
+          initials for medication administration.
+        </p>
+      </div>
 
       {selectedMedication && (
         <div className="medication-modal" onClick={closeMedicationModal}>

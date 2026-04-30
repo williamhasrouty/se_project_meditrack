@@ -492,6 +492,7 @@
 
 .medication-log__medication-name {
   flex: 1;
+  /* font-size: 12px; */
 }
 
 .medication-log__edit-btn {
@@ -1141,6 +1142,148 @@
   }
 }
 
+/* PRN separator row inside the MAR table */
+.medication-log__prn-separator-row {
+  background-color: #f0f9ff;
+}
+
+.medication-log__prn-separator-cell {
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #0369a1;
+  border-top: 2px solid #bae6fd;
+  border-bottom: 1px solid #bae6fd;
+}
+
+.medication-log__row--prn {
+  background-color: #f0f9ff;
+}
+
+.medication-log__row--prn:hover {
+  background-color: #e0f2fe;
+}
+
+.medication-log__time-cell--prn {
+  font-style: italic;
+  color: #0369a1;
+  font-weight: 600;
+}
+
+.medication-log__td_cell--prn {
+  background-color: #f0f9ff;
+  cursor: default;
+}
+
+.medication-log__td_cell--prn:hover {
+  background-color: #bae6fd;
+}
+
+.medication-log__cell-content--prn .medication-log__cell-initials {
+  background-color: #0284c7;
+  color: #fff;
+}
+
+.medication-log__td_cell--prn-log {
+  background-color: #f0f9ff;
+  padding: 6px 10px;
+  vertical-align: middle;
+}
+
+.medication-log__prn-log-empty {
+  font-size: 11px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.medication-log__prn-log-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.medication-log__prn-log-entry {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  border-radius: 6px;
+  padding: 3px 7px;
+  white-space: nowrap;
+}
+
+.medication-log__prn-log-date {
+  font-weight: 700;
+  color: #0369a1;
+}
+
+.medication-log__prn-log-time {
+  color: #0369a1;
+}
+
+.medication-log__prn-log-reason {
+  color: #1e293b;
+}
+
+.medication-log__prn-log-staff {
+  font-weight: 600;
+  color: #0284c7;
+  background: #fff;
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+.medication-log__prn-log-notes {
+  color: #64748b;
+  font-style: italic;
+}
+
+.medication-log__prn-log-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  transition: color 0.15s;
+}
+
+.medication-log__prn-log-delete:hover {
+  color: #ef4444;
+}
+
+.medication-log__prn-give-btn--inline {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  background: linear-gradient(135deg, #0284c7, #7dd3fc);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.medication-log__prn-give-btn--inline:hover {
+  background: linear-gradient(135deg, #0369a1, #0284c7);
+}
+
 /* PRN / As-Needed Medications Section */
 .medication-log__prn-section {
   margin-top: 32px;
@@ -1247,12 +1390,12 @@
 }
 
 .medication-log__prn-give-btn {
-  padding: 10px 20px;
+  padding: 12px;
   background: linear-gradient(135deg, #0284c7 0%, #7dd3fc 100%);
   border: none;
   border-radius: 8px;
   color: white;
-  font-size: 14px;
+  font-size: 28px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
