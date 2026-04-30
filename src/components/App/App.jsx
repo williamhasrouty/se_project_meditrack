@@ -296,7 +296,7 @@ function App() {
                   />
                 ) : (
                   <div className="app__welcome">
-                    <h1>Welcome to MediTrack</h1>
+                    <h1>Welcome to MedTrack</h1>
                     <p className="app__description">
                       A comprehensive medication tracking system for healthcare
                       professionals. Manage client medications, track

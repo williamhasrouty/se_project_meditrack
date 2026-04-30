@@ -40,7 +40,7 @@ function Header({
     <header className="header">
       <div className="header__left">
         <Link to="/" className="header__logo">
-          MediTrack
+          MedTrack
         </Link>
         <span className="header__datetime">{formatDateTime()}</span>
       </div>
