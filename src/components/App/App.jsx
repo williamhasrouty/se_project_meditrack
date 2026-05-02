@@ -36,6 +36,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [dataError, setDataError] = useState("");
   const [selectedClient, setSelectedClient] = useState(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   // Derive isLoggedIn from currentUser instead of using useEffect
   const isLoggedInDerived = !!currentUser;
@@ -73,13 +74,17 @@ function App() {
         .then((user) => {
           setCurrentUser(user);
           setToken(stored);
+          setIsCheckingAuth(false);
         })
         .catch((err) => {
           console.error("Token verification failed:", err);
           localStorage.removeItem("jwt");
           setCurrentUser(null);
           setToken(null);
+          setIsCheckingAuth(false);
         });
+    } else {
+      setIsCheckingAuth(false);
     }
   }, []);
 
@@ -319,7 +324,10 @@ function App() {
             <Route
               path="/client/:clientId"
               element={
-                <ProtectedRoute isLoggedIn={isLoggedInDerived}>
+                <ProtectedRoute
+                  isLoggedIn={isLoggedInDerived}
+                  isCheckingAuth={isCheckingAuth}
+                >
                   <MedicationLog
                     clients={clients}
                     currentUser={currentUser}
@@ -333,7 +341,10 @@ function App() {
             <Route
               path="/profile"
               element={
-                <ProtectedRoute isLoggedIn={isLoggedInDerived}>
+                <ProtectedRoute
+                  isLoggedIn={isLoggedInDerived}
+                  isCheckingAuth={isCheckingAuth}
+                >
                   <Profile
                     onEditProfile={handleEditProfile}
                     onLogout={handleLogout}

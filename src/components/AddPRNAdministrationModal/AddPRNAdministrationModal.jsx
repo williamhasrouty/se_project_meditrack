@@ -60,6 +60,11 @@ function AddPRNAdministrationModal({ onClose, onAddPRN, isOpen, medication }) {
       buttonText={isLoading ? "Recording..." : "Record Administration"}
       isFormValid={isFormValid}
     >
+      {medication?.directions && (
+        <div className="modal__info-box">
+          <strong>Directions:</strong> {medication.directions}
+        </div>
+      )}
       <label className="modal__label">
         Reason for Administration *
         <input
