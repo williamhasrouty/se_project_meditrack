@@ -365,7 +365,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(2, 132, 199, 0.2);
   margin: 20px auto;
-  max-width: 400px;
+  max-width: 600px;
 }
 
 .medication-log__month-btn {
@@ -428,6 +428,35 @@
   border-color: rgba(255, 255, 255, 0.6);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.medication-log__download-btn {
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 6px;
+  color: #0284c7;
+  font-family: "Raleway", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+}
+
+.medication-log__download-btn:hover {
+  background: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.medication-log__download-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .medication-log__table-container {

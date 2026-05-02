@@ -1,6 +1,8 @@
 import "./MedicationLog.css";
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   getMedicationByBrandName,
   parseMedicationData,
@@ -431,6 +433,149 @@ function MedicationLog({
     client?.medications?.filter((med) => !med.isPRN) || [];
   const prnMedications = client?.medications?.filter((med) => med.isPRN) || [];
 
+  // PDF Download function
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF({ orientation: "landscape" });
+
+    // Add title
+    doc.setFontSize(18);
+    doc.text(`Medication Administration Record`, 14, 15);
+
+    // Add client name and month/year
+    doc.setFontSize(12);
+    doc.text(`Client: ${client.name}`, 14, 25);
+    doc.text(`Month: ${monthName} ${selectedYear}`, 14, 32);
+
+    // Prepare table data for scheduled medications
+    const tableHeaders = [
+      "Medication",
+      "Time",
+      ...Array.from({ length: daysInMonth }, (_, i) => (i + 1).toString()),
+    ];
+
+    const tableData = [];
+    scheduledMedications.forEach((medication) => {
+      medication.times.forEach((time, timeIndex) => {
+        const row = [];
+        if (timeIndex === 0) {
+          row.push(medication.name);
+        } else {
+          row.push(""); // Empty cell for medications spanning multiple rows
+        }
+        row.push(time);
+
+        // Add administration data for each day
+        for (let day = 1; day <= daysInMonth; day++) {
+          const key = `${medication._id}-${day}-${time}`;
+          const cellValue = administrations[key] || "";
+          row.push(cellValue);
+        }
+        tableData.push(row);
+      });
+    });
+
+    // Add scheduled medications table
+    autoTable(doc, {
+      startY: 38,
+      head: [tableHeaders],
+      body: tableData,
+      theme: "grid",
+      styles: { fontSize: 7, cellPadding: 1.5, halign: "center" },
+      headStyles: {
+        fillColor: [2, 132, 199],
+        textColor: 255,
+        fontSize: 7,
+        fontStyle: "bold",
+      },
+      columnStyles: {
+        0: { cellWidth: 35, halign: "left" },
+        1: { cellWidth: 18, halign: "center" },
+      },
+      margin: { left: 14, right: 14 },
+      didDrawPage: function (data) {
+        // Add page numbers
+        doc.setFontSize(8);
+        doc.text(
+          `Page ${doc.internal.getCurrentPageInfo().pageNumber}`,
+          doc.internal.pageSize.width / 2,
+          doc.internal.pageSize.height - 10,
+          { align: "center" },
+        );
+      },
+    });
+
+    // Add PRN medications if any
+    if (prnMedications.length > 0) {
+      let finalY = doc.lastAutoTable.finalY || 38;
+
+      // Check if we need a new page for PRN section
+      if (finalY > 160) {
+        doc.addPage();
+        finalY = 20;
+      }
+
+      doc.setFontSize(12);
+      doc.text("PRN / As-Needed Medications", 14, finalY + 10);
+
+      const prnTableData = [];
+      prnMedications.forEach((medication) => {
+        const adminsForMonth = prnAdministrations
+          .filter((admin) => {
+            const d = new Date(admin.administeredAt);
+            return (
+              admin.medicationId === medication._id &&
+              d.getMonth() === selectedMonth &&
+              d.getFullYear() === selectedYear
+            );
+          })
+          .sort(
+            (a, b) => new Date(a.administeredAt) - new Date(b.administeredAt),
+          );
+
+        if (adminsForMonth.length === 0) {
+          prnTableData.push([medication.name, "No administrations this month"]);
+        } else {
+          adminsForMonth.forEach((admin, index) => {
+            const d = new Date(admin.administeredAt);
+            const dateStr = d.toLocaleDateString("en-US", {
+              month: "numeric",
+              day: "numeric",
+            });
+            const timeStr = d.toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+            });
+            const adminDetails = `${dateStr} at ${timeStr} - Reason: ${admin.reason || "N/A"}`;
+
+            if (index === 0) {
+              prnTableData.push([medication.name, adminDetails]);
+            } else {
+              prnTableData.push(["", adminDetails]);
+            }
+          });
+        }
+      });
+
+      autoTable(doc, {
+        startY: finalY + 16,
+        head: [["Medication", "Administration Details"]],
+        body: prnTableData,
+        theme: "grid",
+        styles: { fontSize: 9, cellPadding: 3 },
+        headStyles: { fillColor: [2, 132, 199], textColor: 255 },
+        columnStyles: {
+          0: { cellWidth: 50 },
+          1: { cellWidth: 200 },
+        },
+        margin: { left: 14, right: 14 },
+      });
+    }
+
+    // Save the PDF
+    const fileName = `${client.name.replace(/\s+/g, "_")}_${monthName}_${selectedYear}_MAR.pdf`;
+    doc.save(fileName);
+  };
+
   return (
     <section className="medication-log">
       <div className="medication-log__header">
@@ -684,6 +829,13 @@ function MedicationLog({
           aria-label="Next month"
         >
           ›
+        </button>
+        <button
+          className="medication-log__download-btn"
+          onClick={handleDownloadPDF}
+          title="Download PDF Report"
+        >
+          📥 Download PDF
         </button>
       </div>
 
