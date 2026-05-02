@@ -28,6 +28,7 @@ function MedicationLog({
   refreshClients,
   onEditClient,
   onDeleteClient,
+  isLoading,
 }) {
   const { clientId } = useParams();
   const client = clients?.find((c) => c._id === clientId);
@@ -258,6 +259,24 @@ function MedicationLog({
     selectedYear,
     isLoadingAdministrations,
   ]);
+
+  // Show loading if data is being fetched OR if we're logged in but clients haven't loaded yet
+  if (isLoading || (currentUser && clients.length === 0)) {
+    return (
+      <section className="medication-log">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "50vh",
+          }}
+        >
+          <p>Loading client data...</p>
+        </div>
+      </section>
+    );
+  }
 
   if (!client) {
     return (

@@ -334,6 +334,7 @@ function App() {
                     refreshClients={refreshClients}
                     onEditClient={handleEditClientClick}
                     onDeleteClient={handleDeleteClient}
+                    isLoading={isLoading}
                   />
                 </ProtectedRoute>
               }
