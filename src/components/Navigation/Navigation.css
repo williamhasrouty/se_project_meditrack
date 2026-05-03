@@ -79,6 +79,12 @@
   transform: scale(1.05);
 }
 
+.navigation__notifications-icon {
+  width: 30px;
+  height: 30px;
+  display: block;
+}
+
 .navigation__notifications-badge {
   position: absolute;
   top: 2px;
@@ -110,7 +116,7 @@
   color: #6b7280;
   font-weight: 500;
   font-size: 16px;
-  padding: 8px 16px;
+  padding: 4px;
   border-radius: 8px;
   transition: all 150ms ease-in-out;
 }

@@ -23,8 +23,8 @@ function Header({
 
   const formatDateTime = () => {
     const dateStr = currentDateTime.toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
+      weekday: "long",
+      month: "long",
       day: "numeric",
       year: "numeric",
     });

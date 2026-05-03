@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useState, useContext, useRef, useEffect } from "react";
 import NotificationsContext from "../../contexts/NotificationsContext";
 import NotificationsDropdown from "../NotificationsDropdown/NotificationsDropdown";
+import notificationBell from "../../assets/blue-bell.png";
 
 function Navigation({
   isLoggedIn,
@@ -80,13 +81,15 @@ function Navigation({
                   onClick={toggleNotifications}
                   aria-label="Notifications"
                 >
-                  🔔
+                  
                   {unreadCount > 0 && (
                     <span className="navigation__notifications-badge">
                       {unreadCount}
                     </span>
                   )}
+                 
                 </button>
+
                 <NotificationsDropdown
                   isOpen={isNotificationsOpen}
                   onClose={() => setIsNotificationsOpen(false)}
@@ -101,6 +104,11 @@ function Navigation({
             >
               {isProfilePage ? "Dashboard" : currentUser?.name || "My Profile"}
             </NavLink>
+             <img
+                    src={notificationBell}
+                    alt="Notifications"
+                    className="navigation__notifications-icon"
+                  />
             <button
               className="navigation__button navigation__button_logout"
               onClick={onLogout}
