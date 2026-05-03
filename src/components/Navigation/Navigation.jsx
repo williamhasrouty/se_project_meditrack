@@ -74,28 +74,6 @@ function Navigation({
       <div className="navigation__desktop">
         {isLoggedIn && (
           <div className="navigation__links">
-            {isAdmin && (
-              <div className="navigation__notifications" ref={notificationsRef}>
-                <button
-                  className="navigation__notifications-btn"
-                  onClick={toggleNotifications}
-                  aria-label="Notifications"
-                >
-                  
-                  {unreadCount > 0 && (
-                    <span className="navigation__notifications-badge">
-                      {unreadCount}
-                    </span>
-                  )}
-                 
-                </button>
-
-                <NotificationsDropdown
-                  isOpen={isNotificationsOpen}
-                  onClose={() => setIsNotificationsOpen(false)}
-                />
-              </div>
-            )}
             <NavLink
               to={isProfilePage ? "/" : "/profile"}
               className={({ isActive }) =>
@@ -104,11 +82,31 @@ function Navigation({
             >
               {isProfilePage ? "Dashboard" : currentUser?.name || "My Profile"}
             </NavLink>
-             <img
+            {isAdmin && (
+              <div className="navigation__notifications" ref={notificationsRef}>
+                <button
+                  className="navigation__notifications-btn"
+                  onClick={toggleNotifications}
+                  aria-label="Notifications"
+                >
+                  <img
                     src={notificationBell}
                     alt="Notifications"
                     className="navigation__notifications-icon"
                   />
+                  {unreadCount > 0 && (
+                    <span className="navigation__notifications-badge">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                <NotificationsDropdown
+                  isOpen={isNotificationsOpen}
+                  onClose={() => setIsNotificationsOpen(false)}
+                />
+              </div>
+            )}
             <button
               className="navigation__button navigation__button_logout"
               onClick={onLogout}
