@@ -1,6 +1,8 @@
 import "./Navigation.css";
 import { NavLink, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
+import NotificationsContext from "../../contexts/NotificationsContext";
+import NotificationsDropdown from "../NotificationsDropdown/NotificationsDropdown";
 
 function Navigation({
   isLoggedIn,
@@ -13,6 +15,11 @@ function Navigation({
   const location = useLocation();
   const isProfilePage = location.pathname === "/profile";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const notificationsRef = useRef(null);
+  const { unreadCount } = useContext(NotificationsContext);
+
+  const isAdmin = currentUser?.role === "admin";
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -37,12 +44,55 @@ function Navigation({
     onRegisterClick();
   };
 
+  const toggleNotifications = () => {
+    setIsNotificationsOpen(!isNotificationsOpen);
+  };
+
+  // Close notifications dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        notificationsRef.current &&
+        !notificationsRef.current.contains(event.target)
+      ) {
+        setIsNotificationsOpen(false);
+      }
+    };
+
+    if (isNotificationsOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [isNotificationsOpen]);
+
   return (
     <nav className="navigation">
       {/* Desktop Navigation */}
       <div className="navigation__desktop">
         {isLoggedIn && (
           <div className="navigation__links">
+            {isAdmin && (
+              <div className="navigation__notifications" ref={notificationsRef}>
+                <button
+                  className="navigation__notifications-btn"
+                  onClick={toggleNotifications}
+                  aria-label="Notifications"
+                >
+                  🔔
+                  {unreadCount > 0 && (
+                    <span className="navigation__notifications-badge">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+                <NotificationsDropdown
+                  isOpen={isNotificationsOpen}
+                  onClose={() => setIsNotificationsOpen(false)}
+                />
+              </div>
+            )}
             <NavLink
               to={isProfilePage ? "/" : "/profile"}
               className={({ isActive }) =>

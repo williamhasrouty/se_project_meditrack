@@ -1,8 +1,9 @@
 import "./MedicationLog.css";
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import NotificationsContext from "../../contexts/NotificationsContext";
 import {
   getMedicationByBrandName,
   parseMedicationData,
@@ -33,6 +34,7 @@ function MedicationLog({
   const { clientId } = useParams();
   const client = clients?.find((c) => c._id === clientId);
   const currentDate = new Date();
+  const { addNotification } = useContext(NotificationsContext);
 
   // State for selected month/year (defaults to current month)
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
@@ -396,6 +398,20 @@ function MedicationLog({
     return createPRNAdministration({ ...data, clientId }, token).then(
       (newAdmin) => {
         setPrnAdministrations((prev) => [newAdmin, ...prev]);
+
+        // Create notification (all PRN administrations should notify admins)
+        const medicationName = data.medicationName || "Unknown Medication";
+        const clientName = client?.name || "Unknown Client";
+        const administeringUser = currentUser?.name || "A staff member";
+
+        addNotification({
+          message: `${administeringUser} administered PRN medication "${medicationName}" to ${clientName}`,
+          details: {
+            reason: data.reason || "No reason provided",
+            administeredAt: data.administeredAt,
+            clientId: clientId,
+          },
+        });
       },
     );
   };
