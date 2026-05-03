@@ -865,13 +865,15 @@ function MedicationLog({
         >
           ›
         </button>
-        <button
-          className="medication-log__download-btn"
-          onClick={handleDownloadPDF}
-          title="Download PDF Report"
-        >
-          📥 Download PDF
-        </button>
+        {isAdmin && (
+          <button
+            className="medication-log__download-btn"
+            onClick={handleDownloadPDF}
+            title="Download PDF Report"
+          >
+            📥 Download PDF
+          </button>
+        )}
       </div>
 
       <div className="medication-log__table-container">
