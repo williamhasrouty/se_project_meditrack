@@ -28,6 +28,8 @@
   border: 1px solid rgba(2, 132, 199, 0.1);
   padding: 36px 40px 40px;
   max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
   box-sizing: border-box;
   width: 100%;
   border-radius: 24px;
@@ -73,6 +75,7 @@
   color: #6b7280;
   transition: all 0.2s ease;
   border-radius: 8px;
+  z-index: 10;
 }
 
 .modal__close:hover {
@@ -111,6 +114,13 @@
   font-size: 15px;
 }
 
+.modal__input--textarea {
+  resize: vertical;
+  min-height: 60px;
+  padding: 12px 0;
+  line-height: 1.5;
+}
+
 .modal__label {
   font-size: 14px;
   font-weight: 600;
@@ -127,6 +137,29 @@
   color: #6b7280;
   margin-top: 4px;
   font-style: italic;
+}
+
+.modal__label--checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.modal__label--checkbox span {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.modal__checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #0284c7;
+  margin: 0;
 }
 
 .modal__delete-btn {
@@ -203,4 +236,78 @@
 .modal__link button:hover {
   color: #7dd3fc;
   text-decoration: underline;
+}
+
+.modal__info-box {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-left: 4px solid #0284c7;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  color: #1e40af;
+}
+
+.modal__info-box strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #1e3a8a;
+}
+
+.modal__info-box p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1e40af;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+@media screen and (max-width: 768px) {
+  .modal__content {
+    max-width: 95%;
+    max-height: 95vh;
+    padding: 28px 32px 32px;
+  }
+
+  .modal__close {
+    top: 20px;
+    right: 20px;
+  }
+
+  .modal__title {
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .modal__content {
+    max-width: 100%;
+    max-height: 100vh;
+    padding: 24px 20px 28px;
+    border-radius: 0;
+  }
+
+  .modal__close {
+    top: 16px;
+    right: 16px;
+  }
+
+  .modal__title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .modal__input {
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+
+  .modal__submit {
+    margin-top: 24px;
+    padding: 12px 24px;
+    font-size: 15px;
+  }
 }

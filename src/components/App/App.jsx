@@ -7,13 +7,14 @@ import Footer from "../Footer/Footer";
 import LoginModal from "../LoginModal/LoginModal";
 import RegisterModal from "../RegisterModal/RegisterModal";
 import MedicationLog from "../MedicationLog/MedicationLog";
-import ClientList from "../ClientList/ClientList";
+import Dashboard from "../Dashboard/Dashboard";
 import Profile from "../Profile/Profile";
 import EditProfileModal from "../EditProfileModal/EditProfileModal";
 import AddClientModal from "../AddClientModal/AddClientModal";
 import EditClientModal from "../EditClientModal/EditClientModal";
 import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import CurrentUserContext from "../../contexts/CurrentUserContext";
+import NotificationsContext from "../../contexts/NotificationsContext";
 import { signup, signin, getUser } from "../../utils/auth";
 import updateUser from "../../utils/updateUser";
 import {
@@ -36,6 +37,64 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [dataError, setDataError] = useState("");
   const [selectedClient, setSelectedClient] = useState(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [notifications, setNotifications] = useState([]);
+
+  // Load notifications from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("notifications");
+    if (stored) {
+      try {
+        setNotifications(JSON.parse(stored));
+      } catch (err) {
+        console.error("Failed to parse notifications:", err);
+      }
+    }
+  }, []);
+
+  // Save notifications to localStorage whenever they change
+  useEffect(() => {
+    if (notifications.length > 0) {
+      localStorage.setItem("notifications", JSON.stringify(notifications));
+    }
+  }, [notifications]);
+
+  // Notification handlers
+  const addNotification = (notification) => {
+    const newNotification = {
+      ...notification,
+      id: Date.now(),
+      timestamp: Date.now(),
+      read: false,
+    };
+    setNotifications((prev) => [newNotification, ...prev]);
+  };
+
+  const markAsRead = (id) => {
+    setNotifications((prev) =>
+      prev.map((notif) => (notif.id === id ? { ...notif, read: true } : notif)),
+    );
+  };
+
+  const markAllAsRead = () => {
+    setNotifications((prev) => prev.map((notif) => ({ ...notif, read: true })));
+  };
+
+  const clearAll = () => {
+    setNotifications([]);
+    localStorage.removeItem("notifications");
+  };
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const notificationsValue = {
+    notifications,
+    unreadCount,
+    addNotification,
+    markAsRead,
+    markAllAsRead,
+    clearAll,
+  };
 
   // Derive isLoggedIn from currentUser instead of using useEffect
   const isLoggedInDerived = !!currentUser;
@@ -73,13 +132,17 @@ function App() {
         .then((user) => {
           setCurrentUser(user);
           setToken(stored);
+          setIsCheckingAuth(false);
         })
         .catch((err) => {
           console.error("Token verification failed:", err);
           localStorage.removeItem("jwt");
           setCurrentUser(null);
           setToken(null);
+          setIsCheckingAuth(false);
         });
+    } else {
+      setIsCheckingAuth(false);
     }
   }, []);
 
@@ -267,132 +330,133 @@ function App() {
   }, [activeModal]);
 
   return (
-    <CurrentUserContext.Provider value={currentUser}>
-      <div className="app">
-        <Header
-          isLoggedIn={isLoggedInDerived}
-          onLoginClick={handleLoginClick}
-          onRegisterClick={handleRegisterClick}
-          onLogout={handleLogout}
-          currentUser={currentUser}
-          onAddClient={handleAddClientClick}
-        />
-        <Main>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                isLoggedInDerived ? (
-                  <ClientList
-                    clients={clients}
-                    isLoading={isLoading}
-                    error={dataError}
-                    onEditClient={handleEditClientClick}
-                    onDeleteClient={handleDeleteClient}
-                    currentUser={currentUser}
-                    onAssignClient={handleAssignClient}
-                    onGetStaffUsers={handleGetStaffUsers}
-                  />
-                ) : (
-                  <div className="app__welcome">
-                    <h1>Welcome to MediTrack</h1>
-                    <p className="app__description">
-                      A comprehensive medication tracking system for healthcare
-                      professionals. Manage client medications, track
-                      administration, and maintain accurate records.
-                    </p>
-                    <div className="app__cta">
-                      <button
-                        className="app__button app__button_primary"
-                        onClick={handleLoginClick}
-                      >
-                        Get Started
-                      </button>
+    <NotificationsContext.Provider value={notificationsValue}>
+      <CurrentUserContext.Provider value={currentUser}>
+        <div className="app">
+          <Header
+            isLoggedIn={isLoggedInDerived}
+            onLoginClick={handleLoginClick}
+            onRegisterClick={handleRegisterClick}
+            onLogout={handleLogout}
+            currentUser={currentUser}
+            onAddClient={handleAddClientClick}
+          />
+          <Main>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  isLoggedInDerived ? (
+                    <Dashboard
+                      clients={clients}
+                      isLoading={isLoading}
+                      error={dataError}
+                      onEditClient={handleEditClientClick}
+                      onDeleteClient={handleDeleteClient}
+                      currentUser={currentUser}
+                      onAssignClient={handleAssignClient}
+                      onGetStaffUsers={handleGetStaffUsers}
+                      onAddClient={handleAddClientClick}
+                    />
+                  ) : (
+                    <div className="app__welcome">
+                      <h1>Welcome to MedTrack</h1>
+                      <p className="app__description">
+                        A comprehensive medication tracking system for
+                        healthcare professionals. Manage client medications,
+                        track administration, and maintain accurate records.
+                      </p>
+                      <div className="app__cta">
+                        <button
+                          className="app__button app__button_primary"
+                          onClick={handleLoginClick}
+                        >
+                          Get Started
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )
-              }
-            />
-            <Route path="/medications" element={<MedicationLog />} />
-            <Route
-              path="/clients"
-              element={
-                <ClientList
-                  clients={clients}
-                  isLoading={isLoading}
-                  error={dataError}
-                  onEditClient={handleEditClientClick}
-                  onDeleteClient={handleDeleteClient}
-                />
-              }
-            />
-            <Route
-              path="/client/:clientId"
-              element={
-                <ProtectedRoute isLoggedIn={isLoggedInDerived}>
-                  <MedicationLog
-                    clients={clients}
-                    currentUser={currentUser}
-                    refreshClients={refreshClients}
-                  />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute isLoggedIn={isLoggedInDerived}>
-                  <Profile
-                    onEditProfile={handleEditProfile}
-                    onLogout={handleLogout}
-                    clients={clients}
-                  />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Main>
-        <Footer />
+                  )
+                }
+              />
+              <Route path="/medications" element={<MedicationLog />} />
 
-        <LoginModal
-          isOpen={activeModal === "login"}
-          onClose={closeModal}
-          onLogin={handleLogin}
-          onRegisterClick={() => {
-            setLoginError("");
-            setActiveModal("register");
-          }}
-          errorMessage={loginError}
-        />
-        <RegisterModal
-          isOpen={activeModal === "register"}
-          onClose={closeModal}
-          onRegister={handleRegister}
-          onLoginClick={() => {
-            setRegisterError("");
-            setActiveModal("login");
-          }}
-          errorMessage={registerError}
-        />
-        <EditProfileModal
-          isOpen={activeModal === "edit-profile"}
-          onClose={closeModal}
-          onUpdateUser={handleUpdateUser}
-          currentUser={currentUser}
-        />
-        <AddClientModal
-          isOpen={activeModal === "add-client"}
-          onClose={closeModal}
-          onAddClient={handleAddClient}
-        />
-        <EditClientModal
-          isOpen={activeModal === "edit-client"}
-          onClose={closeModal}
-          onEditClient={handleUpdateClient}
-          client={selectedClient}
-        />
-      </div>
-    </CurrentUserContext.Provider>
+              <Route
+                path="/client/:clientId"
+                element={
+                  <ProtectedRoute
+                    isLoggedIn={isLoggedInDerived}
+                    isCheckingAuth={isCheckingAuth}
+                  >
+                    <MedicationLog
+                      clients={clients}
+                      currentUser={currentUser}
+                      refreshClients={refreshClients}
+                      onEditClient={handleEditClientClick}
+                      onDeleteClient={handleDeleteClient}
+                      isLoading={isLoading}
+                    />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute
+                    isLoggedIn={isLoggedInDerived}
+                    isCheckingAuth={isCheckingAuth}
+                  >
+                    <Profile
+                      onEditProfile={handleEditProfile}
+                      onLogout={handleLogout}
+                      clients={clients}
+                    />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </Main>
+          <Footer />
+
+          <LoginModal
+            isOpen={activeModal === "login"}
+            onClose={closeModal}
+            onLogin={handleLogin}
+            onRegisterClick={() => {
+              setLoginError("");
+              setActiveModal("register");
+            }}
+            errorMessage={loginError}
+          />
+          <RegisterModal
+            isOpen={activeModal === "register"}
+            onClose={closeModal}
+            onRegister={handleRegister}
+            onLoginClick={() => {
+              setRegisterError("");
+              setActiveModal("login");
+            }}
+            errorMessage={registerError}
+          />
+          <EditProfileModal
+            isOpen={activeModal === "edit-profile"}
+            onClose={closeModal}
+            onUpdateUser={handleUpdateUser}
+            currentUser={currentUser}
+          />
+          <AddClientModal
+            isOpen={activeModal === "add-client"}
+            onClose={closeModal}
+            onAddClient={handleAddClient}
+          />
+          <EditClientModal
+            isOpen={activeModal === "edit-client"}
+            onClose={closeModal}
+            onEditClient={handleUpdateClient}
+            client={selectedClient}
+          />
+        </div>
+      </CurrentUserContext.Provider>
+    </NotificationsContext.Provider>
   );
 }
 

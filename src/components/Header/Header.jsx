@@ -23,8 +23,8 @@ function Header({
 
   const formatDateTime = () => {
     const dateStr = currentDateTime.toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
+      weekday: "long",
+      month: "long",
       day: "numeric",
       year: "numeric",
     });
@@ -40,7 +40,7 @@ function Header({
     <header className="header">
       <div className="header__left">
         <Link to="/" className="header__logo">
-          MediTrack
+          MedTrack
         </Link>
         <span className="header__datetime">{formatDateTime()}</span>
       </div>

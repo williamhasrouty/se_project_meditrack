@@ -1,6 +1,9 @@
 import "./MedicationLog.css";
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import NotificationsContext from "../../contexts/NotificationsContext";
 import {
   getMedicationByBrandName,
   parseMedicationData,
@@ -11,19 +14,37 @@ import {
   addMedication,
   updateMedication,
   deleteMedication,
+  getStaffUsers,
+  getPRNAdministrations,
+  createPRNAdministration,
+  deletePRNAdministration,
 } from "../../utils/api";
 import AddMedicationModal from "../AddMedicationModal/AddMedicationModal";
 import EditMedicationModal from "../EditMedicationModal/EditMedicationModal";
+import AddPRNAdministrationModal from "../AddPRNAdministrationModal/AddPRNAdministrationModal";
 
-function MedicationLog({ clients, currentUser, refreshClients }) {
+function MedicationLog({
+  clients,
+  currentUser,
+  refreshClients,
+  onEditClient,
+  onDeleteClient,
+  isLoading,
+}) {
   const { clientId } = useParams();
   const client = clients?.find((c) => c._id === clientId);
   const currentDate = new Date();
-  const currentMonth = currentDate.getMonth();
-  const currentYear = currentDate.getFullYear();
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const { addNotification } = useContext(NotificationsContext);
+
+  // State for selected month/year (defaults to current month)
+  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+  const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
 
   const [administrations, setAdministrations] = useState({});
+  const [staffUsers, setStaffUsers] = useState([]);
+  const [prnAdministrations, setPrnAdministrations] = useState([]);
+  const [selectedPRNMedication, setSelectedPRNMedication] = useState(null);
   const [selectedMedication, setSelectedMedication] = useState(null);
   const [medicationInfo, setMedicationInfo] = useState(null);
   const [isLoadingInfo, setIsLoadingInfo] = useState(false);
@@ -31,17 +52,138 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
     useState(true);
   const [activeModal, setActiveModal] = useState(null);
   const [editingMedication, setEditingMedication] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [isProfileExpanded, setIsProfileExpanded] = useState(false);
   const saveTimeoutRef = useRef(null);
+  const menuRef = useRef(null);
 
   const isAdmin = currentUser?.role === "admin";
 
-  // Load administrations from API on mount
+  // Create initials to name mapping
+  const initialsToName = {};
+  if (currentUser?.name) {
+    const userInitials =
+      currentUser.initials ||
+      currentUser.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase();
+    if (userInitials) {
+      initialsToName[userInitials] = currentUser.name;
+    }
+  }
+  staffUsers.forEach((user) => {
+    if (user?.name) {
+      const initials =
+        user.initials ||
+        user.name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase();
+      if (initials) {
+        initialsToName[initials] = user.name;
+      }
+    }
+  });
+
+  // Fetch staff users for initials-to-name mapping
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      getStaffUsers(token)
+        .then((users) => setStaffUsers(users))
+        .catch((err) => console.error("Failed to fetch staff users:", err));
+    }
+  }, []);
+
+  // Fetch PRN administrations
+  useEffect(() => {
+    if (!clientId) return;
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      getPRNAdministrations(clientId, token)
+        .then((admins) => setPrnAdministrations(admins))
+        .catch((err) =>
+          console.error("Failed to fetch PRN administrations:", err),
+        );
+    }
+  }, [clientId]);
+
+  // Toggle profile expansion
+  const toggleProfile = () => {
+    setIsProfileExpanded(!isProfileExpanded);
+  };
+
+  // Month navigation functions
+  const handlePreviousMonth = () => {
+    if (selectedMonth === 0) {
+      setSelectedMonth(11);
+      setSelectedYear(selectedYear - 1);
+    } else {
+      setSelectedMonth(selectedMonth - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (selectedMonth === 11) {
+      setSelectedMonth(0);
+      setSelectedYear(selectedYear + 1);
+    } else {
+      setSelectedMonth(selectedMonth + 1);
+    }
+  };
+
+  const handleCurrentMonth = () => {
+    setSelectedMonth(currentDate.getMonth());
+    setSelectedYear(currentDate.getFullYear());
+  };
+
+  const isCurrentMonth =
+    selectedMonth === currentDate.getMonth() &&
+    selectedYear === currentDate.getFullYear();
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const monthName = monthNames[selectedMonth];
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [isMenuOpen]);
+
+  // Load administrations from API on mount and when month/year changes
   useEffect(() => {
     const token = localStorage.getItem("jwt");
     if (!token || !clientId) return;
 
     setIsLoadingAdministrations(true);
-    getMedicationAdministrations(clientId, currentMonth, currentYear, token)
+    getMedicationAdministrations(clientId, selectedMonth, selectedYear, token)
       .then((data) => {
         setAdministrations(data.records || {});
         setIsLoadingAdministrations(false);
@@ -50,7 +192,7 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
         console.error("Error loading administrations:", error);
         setIsLoadingAdministrations(false);
       });
-  }, [clientId, currentMonth, currentYear]);
+  }, [clientId, selectedMonth, selectedYear]);
 
   // Save administrations to API whenever they change (with debounce)
   useEffect(() => {
@@ -94,8 +236,8 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
         saveMedicationAdministration(
           {
             clientId,
-            month: currentMonth,
-            year: currentYear,
+            month: selectedMonth,
+            year: selectedYear,
             medicationId,
             records,
           },
@@ -115,10 +257,28 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
   }, [
     administrations,
     clientId,
-    currentMonth,
-    currentYear,
+    selectedMonth,
+    selectedYear,
     isLoadingAdministrations,
   ]);
+
+  // Show loading if data is being fetched OR if we're logged in but clients haven't loaded yet
+  if (isLoading || (currentUser && clients.length === 0)) {
+    return (
+      <section className="medication-log">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "50vh",
+          }}
+        >
+          <p>Loading client data...</p>
+        </div>
+      </section>
+    );
+  }
 
   if (!client) {
     return (
@@ -230,6 +390,46 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
     });
   };
 
+  // PRN Handlers
+  const handleAddPRNAdministration = (data) => {
+    const token = localStorage.getItem("jwt");
+    if (!token) return Promise.reject(new Error("No token"));
+
+    return createPRNAdministration({ ...data, clientId }, token).then(
+      (newAdmin) => {
+        setPrnAdministrations((prev) => [newAdmin, ...prev]);
+
+        // Create notification (all PRN administrations should notify admins)
+        const medicationName = data.medicationName || "Unknown Medication";
+        const clientName = client?.name || "Unknown Client";
+        const administeringUser = currentUser?.name || "A staff member";
+
+        addNotification({
+          message: `${administeringUser} administered PRN medication "${medicationName}" to ${clientName}`,
+          details: {
+            reason: data.reason || "No reason provided",
+            administeredAt: data.administeredAt,
+            clientId: clientId,
+          },
+        });
+      },
+    );
+  };
+
+  const handleDeletePRNAdministration = (id) => {
+    const token = localStorage.getItem("jwt");
+    if (!token) return Promise.reject(new Error("No token"));
+
+    return deletePRNAdministration(id, token).then(() => {
+      setPrnAdministrations((prev) => prev.filter((admin) => admin._id !== id));
+    });
+  };
+
+  const openPRNModal = (medication) => {
+    setSelectedPRNMedication(medication);
+    setActiveModal("add-prn");
+  };
+
   const openAddMedicationModal = () => {
     setActiveModal("add-medication");
   };
@@ -242,14 +442,174 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
   const closeModal = () => {
     setActiveModal(null);
     setEditingMedication(null);
+    setSelectedPRNMedication(null);
   };
 
-  const monthName = new Date(currentYear, currentMonth).toLocaleString(
-    "default",
-    {
-      month: "long",
-    },
-  );
+  const getInitials = (name) => {
+    const names = name.split(" ");
+    if (names.length === 1) return names[0].charAt(0).toUpperCase();
+    return (
+      names[0].charAt(0) + names[names.length - 1].charAt(0)
+    ).toUpperCase();
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "Not provided";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    });
+  };
+
+  // Filter medications into scheduled and PRN
+  const scheduledMedications =
+    client?.medications?.filter((med) => !med.isPRN) || [];
+  const prnMedications = client?.medications?.filter((med) => med.isPRN) || [];
+
+  // PDF Download function
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF({ orientation: "landscape" });
+
+    // Add title
+    doc.setFontSize(18);
+    doc.text(`Medication Administration Record`, 14, 15);
+
+    // Add client name and month/year
+    doc.setFontSize(12);
+    doc.text(`Client: ${client.name}`, 14, 25);
+    doc.text(`Month: ${monthName} ${selectedYear}`, 14, 32);
+
+    // Prepare table data for scheduled medications
+    const tableHeaders = [
+      "Medication",
+      "Time",
+      ...Array.from({ length: daysInMonth }, (_, i) => (i + 1).toString()),
+    ];
+
+    const tableData = [];
+    scheduledMedications.forEach((medication) => {
+      medication.times.forEach((time, timeIndex) => {
+        const row = [];
+        if (timeIndex === 0) {
+          row.push(medication.name);
+        } else {
+          row.push(""); // Empty cell for medications spanning multiple rows
+        }
+        row.push(time);
+
+        // Add administration data for each day
+        for (let day = 1; day <= daysInMonth; day++) {
+          const key = `${medication._id}-${day}-${time}`;
+          const cellValue = administrations[key] || "";
+          row.push(cellValue);
+        }
+        tableData.push(row);
+      });
+    });
+
+    // Add scheduled medications table
+    autoTable(doc, {
+      startY: 38,
+      head: [tableHeaders],
+      body: tableData,
+      theme: "grid",
+      styles: { fontSize: 7, cellPadding: 1.5, halign: "center" },
+      headStyles: {
+        fillColor: [2, 132, 199],
+        textColor: 255,
+        fontSize: 7,
+        fontStyle: "bold",
+      },
+      columnStyles: {
+        0: { cellWidth: 35, halign: "left" },
+        1: { cellWidth: 18, halign: "center" },
+      },
+      margin: { left: 14, right: 14 },
+      didDrawPage: function (data) {
+        // Add page numbers
+        doc.setFontSize(8);
+        doc.text(
+          `Page ${doc.internal.getCurrentPageInfo().pageNumber}`,
+          doc.internal.pageSize.width / 2,
+          doc.internal.pageSize.height - 10,
+          { align: "center" },
+        );
+      },
+    });
+
+    // Add PRN medications if any
+    if (prnMedications.length > 0) {
+      let finalY = doc.lastAutoTable.finalY || 38;
+
+      // Check if we need a new page for PRN section
+      if (finalY > 160) {
+        doc.addPage();
+        finalY = 20;
+      }
+
+      doc.setFontSize(12);
+      doc.text("PRN / As-Needed Medications", 14, finalY + 10);
+
+      const prnTableData = [];
+      prnMedications.forEach((medication) => {
+        const adminsForMonth = prnAdministrations
+          .filter((admin) => {
+            const d = new Date(admin.administeredAt);
+            return (
+              admin.medicationId === medication._id &&
+              d.getMonth() === selectedMonth &&
+              d.getFullYear() === selectedYear
+            );
+          })
+          .sort(
+            (a, b) => new Date(a.administeredAt) - new Date(b.administeredAt),
+          );
+
+        if (adminsForMonth.length === 0) {
+          prnTableData.push([medication.name, "No administrations this month"]);
+        } else {
+          adminsForMonth.forEach((admin, index) => {
+            const d = new Date(admin.administeredAt);
+            const dateStr = d.toLocaleDateString("en-US", {
+              month: "numeric",
+              day: "numeric",
+            });
+            const timeStr = d.toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+            });
+            const adminDetails = `${dateStr} at ${timeStr} - Reason: ${admin.reason || "N/A"}`;
+
+            if (index === 0) {
+              prnTableData.push([medication.name, adminDetails]);
+            } else {
+              prnTableData.push(["", adminDetails]);
+            }
+          });
+        }
+      });
+
+      autoTable(doc, {
+        startY: finalY + 16,
+        head: [["Medication", "Administration Details"]],
+        body: prnTableData,
+        theme: "grid",
+        styles: { fontSize: 9, cellPadding: 3 },
+        headStyles: { fillColor: [2, 132, 199], textColor: 255 },
+        columnStyles: {
+          0: { cellWidth: 50 },
+          1: { cellWidth: 200 },
+        },
+        margin: { left: 14, right: 14 },
+      });
+    }
+
+    // Save the PDF
+    const fileName = `${client.name.replace(/\s+/g, "_")}_${monthName}_${selectedYear}_MAR.pdf`;
+    doc.save(fileName);
+  };
 
   return (
     <section className="medication-log">
@@ -258,21 +618,262 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
           ← Back to Client List
         </Link>
         <div className="medication-log__header-content">
-          <div>
+          {/* <div>
             <h1 className="medication-log__title">{client.name}</h1>
-            <h2 className="medication-log__subtitle">
-              Medication Administration Record - {monthName} {currentYear}
-            </h2>
-          </div>
+          </div> */}
+          <h2 className="medication-log__subtitle">
+            Medication Administration Record - {monthName} {selectedYear}
+          </h2>
           {isAdmin && (
-            <button
-              className="medication-log__add-btn"
-              onClick={openAddMedicationModal}
+            <div className="medication-log__menu-wrapper" ref={menuRef}>
+              <button
+                className={`medication-log__menu-btn ${
+                  isMenuOpen ? "medication-log__menu-btn--open" : ""
+                }`}
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label="Actions menu"
+              >
+                Actions
+                <span className="medication-log__menu-arrow">▼</span>
+              </button>
+              {isMenuOpen && (
+                <div className="medication-log__dropdown">
+                  <button
+                    className="medication-log__dropdown-item medication-log__dropdown-item--add"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      openAddMedicationModal();
+                    }}
+                  >
+                    <span className="medication-log__dropdown-icon">+</span>
+                    Add Medication
+                  </button>
+                  <button
+                    className="medication-log__dropdown-item medication-log__dropdown-item--edit"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      onEditClient(client);
+                    }}
+                  >
+                    <span className="medication-log__dropdown-icon">✎</span>
+                    Edit Client
+                  </button>
+                  <button
+                    className="medication-log__dropdown-item medication-log__dropdown-item--delete"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      setShowDeleteConfirmation(true);
+                    }}
+                  >
+                    <span className="medication-log__dropdown-icon">🗑</span>
+                    Delete Client
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Client Profile Section */}
+      <div className="medication-log__profile">
+        <div
+          className="medication-log__profile-header"
+          onClick={toggleProfile}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              toggleProfile();
+            }
+          }}
+        >
+          <div className="medication-log__profile-avatar">
+            {client.imageUrl ? (
+              <img
+                src={client.imageUrl}
+                alt={client.name}
+                className="medication-log__profile-avatar-image"
+              />
+            ) : (
+              <div className="medication-log__profile-avatar-initials">
+                {getInitials(client.name)}
+              </div>
+            )}
+          </div>
+          <div className="medication-log__profile-header-info">
+            <h3 className="medication-log__profile-name">{client.name}</h3>
+
+            <span
+              className={`medication-log__profile-status ${
+                client.isActive
+                  ? "medication-log__profile-status--active"
+                  : "medication-log__profile-status--inactive"
+              }`}
             >
-              + Add Medication
+              {client.isActive ? "Active" : "Inactive"}
+            </span>
+          </div>
+          <div
+            className={`medication-log__profile-chevron ${
+              isProfileExpanded
+                ? "medication-log__profile-chevron--expanded"
+                : ""
+            }`}
+          >
+            ▼
+          </div>
+        </div>
+
+        <div
+          className={`medication-log__profile-body ${
+            isProfileExpanded ? "medication-log__profile-body--visible" : ""
+          }`}
+        >
+          <div className="medication-log__profile-section">
+            <h4 className="medication-log__profile-section-title">
+              Personal Information
+            </h4>
+            <div className="medication-log__profile-grid">
+              <div className="medication-log__profile-field">
+                <span className="medication-log__profile-label">
+                  Date of Birth:
+                </span>
+                <span className="medication-log__profile-value">
+                  {formatDate(client.dateOfBirth)}
+                </span>
+              </div>
+              <div className="medication-log__profile-field">
+                <span className="medication-log__profile-label">Region:</span>
+                <span className="medication-log__profile-value">
+                  {client.region}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {(client.allergies || client.diagnoses) && (
+            <div className="medication-log__profile-section">
+              <h4 className="medication-log__profile-section-title">
+                Medical Information
+              </h4>
+              {client.allergies && (
+                <div className="medication-log__profile-field medication-log__profile-field--full">
+                  <span className="medication-log__profile-label">
+                    Allergies:
+                  </span>
+                  <span className="medication-log__profile-value">
+                    {client.allergies}
+                  </span>
+                </div>
+              )}
+              {client.diagnoses && (
+                <div className="medication-log__profile-field medication-log__profile-field--full">
+                  <span className="medication-log__profile-label">
+                    Diagnoses / Conditions:
+                  </span>
+                  <span className="medication-log__profile-value">
+                    {client.diagnoses}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {(client.prescribingPhysician || client.pharmacyInfo) && (
+            <div className="medication-log__profile-section">
+              <h4 className="medication-log__profile-section-title">
+                Healthcare Providers
+              </h4>
+              {client.prescribingPhysician && (
+                <div className="medication-log__profile-field medication-log__profile-field--full">
+                  <span className="medication-log__profile-label">
+                    Prescribing Physician:
+                  </span>
+                  <span className="medication-log__profile-value">
+                    {client.prescribingPhysician}
+                  </span>
+                </div>
+              )}
+              {client.pharmacyInfo && (
+                <div className="medication-log__profile-field medication-log__profile-field--full">
+                  <span className="medication-log__profile-label">
+                    Pharmacy Information:
+                  </span>
+                  <span className="medication-log__profile-value">
+                    {client.pharmacyInfo}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {client.emergencyContacts && (
+            <div className="medication-log__profile-section">
+              <h4 className="medication-log__profile-section-title">
+                Emergency Contacts
+              </h4>
+              <div className="medication-log__profile-field medication-log__profile-field--full">
+                <span className="medication-log__profile-value">
+                  {client.emergencyContacts}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {client.notes && (
+            <div className="medication-log__profile-section">
+              <h4 className="medication-log__profile-section-title">Notes</h4>
+              <div className="medication-log__profile-field medication-log__profile-field--full">
+                <span className="medication-log__profile-value medication-log__profile-value--notes">
+                  {client.notes}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Month Navigation */}
+      <div className="medication-log__month-nav">
+        <button
+          className="medication-log__month-btn"
+          onClick={handlePreviousMonth}
+          aria-label="Previous month"
+        >
+          ‹
+        </button>
+        <div className="medication-log__month-display">
+          <span className="medication-log__month-name">
+            {monthName} {selectedYear}
+          </span>
+          {!isCurrentMonth && (
+            <button
+              className="medication-log__current-month-btn"
+              onClick={handleCurrentMonth}
+              title="Go to current month"
+            >
+              Today
             </button>
           )}
         </div>
+        <button
+          className="medication-log__month-btn"
+          onClick={handleNextMonth}
+          aria-label="Next month"
+        >
+          ›
+        </button>
+        {isAdmin && (
+          <button
+            className="medication-log__download-btn"
+            onClick={handleDownloadPDF}
+            title="Download PDF Report"
+          >
+            📥 Download PDF
+          </button>
+        )}
       </div>
 
       <div className="medication-log__table-container">
@@ -296,7 +897,7 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
             </tr>
           </thead>
           <tbody>
-            {client.medications.map((medication) =>
+            {scheduledMedications.map((medication) =>
               medication.times.map((time, timeIndex) => (
                 <tr
                   key={`${medication._id}-${time}`}
@@ -331,6 +932,8 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
                   {Array.from({ length: daysInMonth }, (_, i) => {
                     const day = i + 1;
                     const key = `${medication._id}-${day}-${time}`;
+                    const cellValue = administrations[key] || "";
+                    const staffName = cellValue && initialsToName[cellValue];
                     return (
                       <td
                         key={day}
@@ -339,13 +942,142 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
                           handleCellClick(medication._id, day, time)
                         }
                       >
-                        {administrations[key] || ""}
+                        {cellValue && (
+                          <div className="medication-log__cell-content">
+                            <span className="medication-log__cell-initials">
+                              {cellValue}
+                            </span>
+                            {staffName && currentUser?.role === "admin" && (
+                              <div className="medication-log__cell-tooltip">
+                                {staffName}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </td>
                     );
                   })}
                 </tr>
               )),
             )}
+            {prnMedications.length > 0 && (
+              <tr className="medication-log__prn-separator-row">
+                <td
+                  colSpan={daysInMonth + 2}
+                  className="medication-log__prn-separator-cell"
+                >
+                  PRN / As-Needed Medications
+                </td>
+              </tr>
+            )}
+            {prnMedications.map((medication) => {
+              const adminsForMonth = prnAdministrations
+                .filter((admin) => {
+                  const d = new Date(admin.administeredAt);
+                  return (
+                    admin.medicationId === medication._id &&
+                    d.getMonth() === selectedMonth &&
+                    d.getFullYear() === selectedYear
+                  );
+                })
+                .sort(
+                  (a, b) =>
+                    new Date(a.administeredAt) - new Date(b.administeredAt),
+                );
+
+              return (
+                <tr
+                  key={medication._id}
+                  className="medication-log__row medication-log__row--prn"
+                >
+                  <td className="medication-log__medication-cell">
+                    <div className="medication-log__medication-content">
+                      <span className="medication-log__medication-name">
+                        {medication.name}
+                      </span>
+                      {isAdmin && (
+                        <button
+                          className="medication-log__edit-btn"
+                          onClick={() => openEditMedicationModal(medication)}
+                          aria-label="Edit medication"
+                        >
+                          Edit
+                        </button>
+                      )}
+                      <button
+                        className="medication-log__prn-give-btn medication-log__prn-give-btn--inline"
+                        onClick={() => openPRNModal(medication)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </td>
+                  <td
+                    className="medication-log__td medication-log__td_cell--prn-log"
+                    colSpan={daysInMonth + 1}
+                  >
+                    {adminsForMonth.length === 0 ? (
+                      <span className="medication-log__prn-log-empty">
+                        No administrations this month
+                      </span>
+                    ) : (
+                      <ul className="medication-log__prn-log-list">
+                        {adminsForMonth.map((admin) => {
+                          const d = new Date(admin.administeredAt);
+                          return (
+                            <li
+                              key={admin._id}
+                              className="medication-log__prn-log-entry"
+                            >
+                              <span className="medication-log__prn-log-date">
+                                {d.toLocaleDateString("en-US", {
+                                  month: "numeric",
+                                  day: "numeric",
+                                })}
+                              </span>
+                              <span className="medication-log__prn-log-time">
+                                {d.toLocaleTimeString("en-US", {
+                                  hour: "numeric",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                              <span className="medication-log__prn-log-reason">
+                                {admin.reason}
+                              </span>
+                              <span className="medication-log__prn-log-staff">
+                                {admin.staffInitials}
+                              </span>
+                              {admin.notes && (
+                                <span className="medication-log__prn-log-notes">
+                                  {admin.notes}
+                                </span>
+                              )}
+                              {isAdmin && (
+                                <button
+                                  className="medication-log__prn-log-delete"
+                                  onClick={() => {
+                                    if (
+                                      window.confirm(
+                                        "Delete this administration record?",
+                                      )
+                                    ) {
+                                      handleDeletePRNAdministration(admin._id);
+                                    }
+                                  }}
+                                  title="Delete record"
+                                >
+                                  ×
+                                </button>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -437,6 +1169,64 @@ function MedicationLog({ clients, currentUser, refreshClients }) {
         onDeleteMedication={handleDeleteMedication}
         medication={editingMedication}
       />
+
+      <AddPRNAdministrationModal
+        isOpen={activeModal === "add-prn"}
+        onClose={closeModal}
+        onAddPRN={handleAddPRNAdministration}
+        medication={selectedPRNMedication}
+      />
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirmation && (
+        <div
+          className="confirmation-modal"
+          onClick={() => setShowDeleteConfirmation(false)}
+        >
+          <div
+            className="confirmation-modal__content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="confirmation-modal__close"
+              onClick={() => setShowDeleteConfirmation(false)}
+            >
+              ×
+            </button>
+            <div className="confirmation-modal__icon confirmation-modal__icon--warning">
+              ⚠️
+            </div>
+            <h2 className="confirmation-modal__title">Delete Client?</h2>
+            <p className="confirmation-modal__message">
+              Are you sure you want to delete <strong>{client.name}</strong>?
+              This will permanently delete all their medications and
+              administration records.
+            </p>
+            <p className="confirmation-modal__warning">
+              This action cannot be undone.
+            </p>
+            <div className="confirmation-modal__actions">
+              <button
+                className="confirmation-modal__btn confirmation-modal__btn--cancel"
+                onClick={() => setShowDeleteConfirmation(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="confirmation-modal__btn confirmation-modal__btn--delete"
+                onClick={() => {
+                  setShowDeleteConfirmation(false);
+                  onDeleteClient(client._id).then(() => {
+                    window.location.href = "/";
+                  });
+                }}
+              >
+                Delete Client
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

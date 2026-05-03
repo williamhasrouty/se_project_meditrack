@@ -1,4 +1,4 @@
-# MediTrack
+# MedTrack
 
 A comprehensive medication tracking system for healthcare professionals to manage client medications, track administration, and maintain accurate records.
 
