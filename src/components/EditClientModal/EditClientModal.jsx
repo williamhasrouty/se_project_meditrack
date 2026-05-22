@@ -191,15 +191,18 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
           rows={3}
         />
       </label>
-      <label className="modal__label modal__label--checkbox">
-        <input
-          type="checkbox"
-          className="modal__checkbox"
+      <label className="modal__label">
+        Client Status
+        <select
+          className="modal__input"
           name="isActive"
-          checked={isActive}
-          onChange={(e) => setIsActive(e.target.checked)}
-        />
-        <span>Active Client</span>
+          value={isActive ? "active" : "inactive"}
+          onChange={(e) => setIsActive(e.target.value === "active")}
+          required
+        >
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
       </label>
     </ModalWithForm>
   );
