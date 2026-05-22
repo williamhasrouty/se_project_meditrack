@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
 
 function EditClientModal({ onClose, onEditClient, isOpen, client }) {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [region, setRegion] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
@@ -17,7 +18,14 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
 
   useEffect(() => {
     if (client) {
-      setName(client.name || "");
+      const nameParts = (client.name || "").split(" ");
+      if (nameParts.length >= 2) {
+        setFirstName(nameParts[0]);
+        setLastName(nameParts.slice(1).join(" "));
+      } else {
+        setFirstName(client.name || "");
+        setLastName("");
+      }
       setRegion(client.region || "");
       setImageUrl(client.imageUrl || "");
       setDateOfBirth(
@@ -38,6 +46,7 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
+    const name = `${firstName} ${lastName}`.trim();
     onEditClient({
       name,
       region,
@@ -72,17 +81,31 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
       modalSize="wide"
     >
       <label className="modal__label">
-        Client Name
+        First Name
         <input
           type="text"
           className="modal__input"
-          name="name"
-          placeholder="Enter client name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          name="firstName"
+          placeholder="Enter first name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
           required
           minLength={2}
-          maxLength={50}
+          maxLength={30}
+        />
+      </label>
+      <label className="modal__label">
+        Last Name
+        <input
+          type="text"
+          className="modal__input"
+          name="lastName"
+          placeholder="Enter last name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+          minLength={2}
+          maxLength={30}
         />
       </label>
       <label className="modal__label">
@@ -114,7 +137,7 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
         />
       </label>
       <label className="modal__label">
-        Photo URL (optional)
+        Photo URL
         <input
           type="url"
           className="modal__input"
@@ -126,7 +149,7 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
       </label>
 
       <label className="modal__label">
-        Allergies (optional)
+        Allergies
         <textarea
           className="modal__input modal__input--textarea"
           name="allergies"
@@ -137,7 +160,7 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
         />
       </label>
       <label className="modal__label">
-        Diagnoses / Conditions (optional)
+        Diagnoses / Conditions
         <textarea
           className="modal__input modal__input--textarea"
           name="diagnoses"
@@ -148,7 +171,7 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
         />
       </label>
       <label className="modal__label">
-        Emergency Contacts (optional)
+        Emergency Contacts
         <textarea
           className="modal__input modal__input--textarea"
           name="emergencyContacts"
@@ -159,7 +182,7 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
         />
       </label>
       <label className="modal__label">
-        Prescribing Physician (optional)
+        Prescribing Physician
         <input
           type="text"
           className="modal__input"
@@ -170,7 +193,7 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
         />
       </label>
       <label className="modal__label">
-        Pharmacy Information (optional)
+        Pharmacy Information
         <input
           type="text"
           className="modal__input"
@@ -181,7 +204,7 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
         />
       </label>
       <label className="modal__label">
-        Notes (optional)
+        Notes
         <textarea
           className="modal__input modal__input--textarea"
           name="notes"

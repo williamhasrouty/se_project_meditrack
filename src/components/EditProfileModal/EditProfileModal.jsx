@@ -5,15 +5,21 @@ import { useForm } from "../../utils/hooks/useForm";
 
 function EditProfileModal({ isOpen, onClose, onUpdateUser, currentUser }) {
   const { values, handleChange, setValues } = useForm({
-    name: "",
+    firstName: "",
+    lastName: "",
     avatar: "",
     initials: "",
   });
 
   useEffect(() => {
     if (isOpen && currentUser) {
+      const nameParts = (currentUser.name || "").split(" ");
+      const firstName = nameParts[0] || "";
+      const lastName =
+        nameParts.length >= 2 ? nameParts.slice(1).join(" ") : "";
       setValues({
-        name: currentUser.name || "",
+        firstName,
+        lastName,
         avatar: currentUser.avatar || "",
         initials: currentUser.initials || "",
       });
@@ -22,7 +28,8 @@ function EditProfileModal({ isOpen, onClose, onUpdateUser, currentUser }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onUpdateUser(values);
+    const name = `${values.firstName} ${values.lastName}`.trim();
+    onUpdateUser({ ...values, name });
   };
 
   const handleInitialsChange = (e) => {
@@ -39,16 +46,37 @@ function EditProfileModal({ isOpen, onClose, onUpdateUser, currentUser }) {
       onSubmit={handleSubmit}
       buttonText="Save changes"
     >
-      <label htmlFor="edit-profile-name" className="edit-profile-form__label">
-        Name *
+      <label
+        htmlFor="edit-profile-firstName"
+        className="edit-profile-form__label"
+      >
+        First Name *
       </label>
       <input
-        id="edit-profile-name"
-        name="name"
+        id="edit-profile-firstName"
+        name="firstName"
         type="text"
-        placeholder="Enter your name"
+        placeholder="Enter your first name"
         className="edit-profile-form__input"
-        value={values.name}
+        value={values.firstName}
+        onChange={handleChange}
+        required
+        minLength={2}
+        maxLength={30}
+      />
+      <label
+        htmlFor="edit-profile-lastName"
+        className="edit-profile-form__label"
+      >
+        Last Name *
+      </label>
+      <input
+        id="edit-profile-lastName"
+        name="lastName"
+        type="text"
+        placeholder="Enter your last name"
+        className="edit-profile-form__input"
+        value={values.lastName}
         onChange={handleChange}
         required
         minLength={2}

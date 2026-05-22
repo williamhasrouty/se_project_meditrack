@@ -13,18 +13,20 @@ function RegisterModal({
   const { values, handleChange, setValues } = useForm({
     email: "",
     password: "",
-    name: "",
+    firstName: "",
+    lastName: "",
   });
 
   useEffect(() => {
     if (isOpen) {
-      setValues({ email: "", password: "", name: "" });
+      setValues({ email: "", password: "", firstName: "", lastName: "" });
     }
   }, [isOpen, setValues]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onRegister(values);
+    const name = `${values.firstName} ${values.lastName}`.trim();
+    onRegister({ ...values, name });
   };
 
   return (
@@ -63,18 +65,36 @@ function RegisterModal({
         required
       />
 
-      <label htmlFor="register-name" className="register-form__label">
-        Name
+      <label htmlFor="register-firstName" className="register-form__label">
+        First Name
       </label>
       <input
-        id="register-name"
-        name="name"
+        id="register-firstName"
+        name="firstName"
         type="text"
-        placeholder="Name*"
+        placeholder="First Name*"
         className="register-form__input"
-        value={values.name}
+        value={values.firstName}
         onChange={handleChange}
         required
+        minLength={2}
+        maxLength={30}
+      />
+
+      <label htmlFor="register-lastName" className="register-form__label">
+        Last Name
+      </label>
+      <input
+        id="register-lastName"
+        name="lastName"
+        type="text"
+        placeholder="Last Name*"
+        className="register-form__input"
+        value={values.lastName}
+        onChange={handleChange}
+        required
+        minLength={2}
+        maxLength={30}
       />
 
       {errorMessage && <p className="register-form__error">{errorMessage}</p>}

@@ -253,16 +253,9 @@ function App() {
 
   const handleDeleteClient = (clientId) => {
     if (!token) return Promise.reject(new Error("No token"));
-    if (
-      window.confirm(
-        "Are you sure you want to delete this client? This will also delete all their medications.",
-      )
-    ) {
-      return deleteClient(clientId, token).then(() => {
-        setClients(clients.filter((client) => client._id !== clientId));
-      });
-    }
-    return Promise.resolve();
+    return deleteClient(clientId, token).then(() => {
+      setClients(clients.filter((client) => client._id !== clientId));
+    });
   };
 
   const handleUpdateUser = (userData) => {

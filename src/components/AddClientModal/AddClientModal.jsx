@@ -2,7 +2,8 @@ import { useState } from "react";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
 
 function AddClientModal({ onClose, onAddClient, isOpen }) {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [region, setRegion] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
@@ -18,6 +19,7 @@ function AddClientModal({ onClose, onAddClient, isOpen }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
+    const name = `${firstName} ${lastName}`.trim();
     onAddClient({
       name,
       region,
@@ -32,7 +34,8 @@ function AddClientModal({ onClose, onAddClient, isOpen }) {
       isActive,
     })
       .then(() => {
-        setName("");
+        setFirstName("");
+        setLastName("");
         setRegion("");
         setImageUrl("");
         setDateOfBirth("");
@@ -62,17 +65,31 @@ function AddClientModal({ onClose, onAddClient, isOpen }) {
       onSubmit={handleSubmit}
     >
       <label className="modal__label">
-        Client Name
+        First Name
         <input
           type="text"
           className="modal__input"
-          name="name"
-          placeholder="Enter client name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          name="firstName"
+          placeholder="Enter first name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
           required
           minLength={2}
-          maxLength={50}
+          maxLength={30}
+        />
+      </label>
+      <label className="modal__label">
+        Last Name
+        <input
+          type="text"
+          className="modal__input"
+          name="lastName"
+          placeholder="Enter last name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+          minLength={2}
+          maxLength={30}
         />
       </label>
       <label className="modal__label">
