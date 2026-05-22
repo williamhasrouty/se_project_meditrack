@@ -7,10 +7,14 @@ function ModalWithForm({
   onSubmit,
   buttonText,
   children,
+  modalSize = "default",
 }) {
   return (
     <div className={`modal ${isOpen ? "modal_opened" : ""}`} onClick={onClose}>
-      <div className="modal__content" onClick={(e) => e.stopPropagation()}>
+      <div
+        className={`modal__content modal__content--${modalSize}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <button className="modal__close" onClick={onClose} type="button">
           ×
         </button>

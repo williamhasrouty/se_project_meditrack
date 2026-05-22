@@ -69,6 +69,7 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={handleSubmit}
+      modalSize="wide"
     >
       <label className="modal__label">
         Client Name
@@ -101,7 +102,7 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
           <option value="SDRC">SDRC</option>
         </select>
       </label>
-        <label className="modal__label">
+      <label className="modal__label">
         Date of Birth
         <input
           type="date"
@@ -123,7 +124,7 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
           onChange={(e) => setImageUrl(e.target.value)}
         />
       </label>
-    
+
       <label className="modal__label">
         Allergies (optional)
         <textarea
