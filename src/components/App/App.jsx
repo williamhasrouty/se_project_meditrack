@@ -105,8 +105,7 @@ function App() {
     console.warn("Session timeout - logging out");
     addNotification({
       type: "warning",
-      message:
-        "Your session has timed out due to inactivity. Please log in again.",
+      message: "You have been logged out due to inactivity.",
     });
     handleLogout();
   };

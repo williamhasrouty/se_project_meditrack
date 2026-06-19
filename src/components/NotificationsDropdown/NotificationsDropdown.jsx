@@ -76,7 +76,11 @@ function NotificationsDropdown({ isOpen, onClose }) {
               >
                 <div className="notifications-dropdown__item-header">
                   <span className="notifications-dropdown__item-type">
-                    PRN Alert
+                    {notification.details
+                      ? "PRN Alert"
+                      : notification.type === "warning"
+                        ? "Alert"
+                        : "Notification"}
                   </span>
                   <span className="notifications-dropdown__item-time">
                     {formatTimestamp(notification.timestamp)}
