@@ -17,6 +17,7 @@ import CurrentUserContext from "../../contexts/CurrentUserContext";
 import NotificationsContext from "../../contexts/NotificationsContext";
 import { signup, signin, getUser } from "../../utils/auth";
 import updateUser from "../../utils/updateUser";
+import useSessionTimeout from "../../utils/hooks/useSessionTimeout";
 import {
   getClients,
   addClient,
@@ -98,6 +99,24 @@ function App() {
 
   // Derive isLoggedIn from currentUser instead of using useEffect
   const isLoggedInDerived = !!currentUser;
+
+  // Session timeout: auto-logout after 30 minutes of inactivity
+  const handleSessionTimeout = () => {
+    console.warn("Session timeout - logging out");
+    addNotification({
+      type: "warning",
+      message:
+        "Your session has timed out due to inactivity. Please log in again.",
+    });
+    handleLogout();
+  };
+
+  // Enable session timeout only when user is logged in
+  useSessionTimeout(
+    handleSessionTimeout,
+    30 * 60 * 1000, // 30 minutes
+    isLoggedInDerived,
+  );
 
   // Load clients when user logs in
   useEffect(() => {
