@@ -25,7 +25,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  background: linear-gradient(135deg, #0284c7, #7dd3fc);
+  background: #0284c7;
   border: none;
   border-radius: 8px;
   color: white;
@@ -38,9 +38,8 @@
 }
 
 .medication-log__menu-btn:hover {
-  background: linear-gradient(135deg, #0369a1, #0284c7);
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+  background: #0369a1;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
 }
 
 .medication-log__menu-btn:active {
@@ -62,9 +61,9 @@
   right: 0;
   min-width: 200px;
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e0f2fe;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   z-index: 100;
   animation: slideDown 0.2s ease;
@@ -147,17 +146,13 @@
 .medication-log__back-btn:hover {
   background: #0284c7;
   color: white;
-  transform: translateX(-4px);
 }
 
 .medication-log__title {
   margin: 0 0 4px;
   font-size: 24px;
   font-weight: 700;
-  background: linear-gradient(135deg, #0284c7 0%, #7dd3fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #0369a1;
 }
 
 .medication-log__subtitle {
@@ -177,15 +172,15 @@
 
 .medication-log__profile {
   background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  border: 1px solid #e0f2fe;
   margin-bottom: 24px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .medication-log__profile-header {
-  background: linear-gradient(135deg, #0284c7, #7dd3fc);
+  background: #0284c7;
   padding: 12px;
   display: flex;
   align-items: center;
@@ -195,7 +190,7 @@
 }
 
 .medication-log__profile-header:hover {
-  background: linear-gradient(135deg, #0369a1, #0ea5e9);
+  background: #0369a1;
 }
 
 .medication-log__profile-avatar {
@@ -360,10 +355,10 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  background: linear-gradient(135deg, #0284c7, #7dd3fc);
+  background: #0284c7;
   padding: 8px 16px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.2);
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.2);
   margin: 20px auto;
   max-width: 600px;
 }
@@ -388,7 +383,6 @@
 .medication-log__month-btn:hover {
   background: rgba(255, 255, 255, 0.3);
   border-color: rgba(255, 255, 255, 0.5);
-  transform: scale(1.1);
 }
 
 .medication-log__month-btn:active {
@@ -426,8 +420,6 @@
 .medication-log__current-month-btn:hover {
   background: rgba(255, 255, 255, 0.4);
   border-color: rgba(255, 255, 255, 0.6);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .medication-log__download-btn {
@@ -450,21 +442,19 @@
 
 .medication-log__download-btn:hover {
   background: white;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .medication-log__download-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .medication-log__table-container {
   overflow-x: auto;
-  border-radius: 12px;
-  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  border: 2px solid #e0f2fe;
   background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .medication-log__table {
@@ -541,7 +531,6 @@
 .medication-log__edit-btn:hover {
   background: #e0f2fe;
   border-color: #93c5fd;
-  transform: translateY(-1px);
 }
 
 .medication-log__row {
@@ -672,15 +661,15 @@
 
 .medication-modal__content {
   position: relative;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
-  border: 1px solid rgba(2, 132, 199, 0.1);
+  background: #ffffff;
+  border: 1px solid #e0f2fe;
   padding: 32px;
   max-width: 700px;
   width: 100%;
   max-height: 80vh;
   overflow-y: auto;
-  border-radius: 24px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   animation: modalSlideIn 0.3s ease-out;
 }
 
@@ -700,19 +689,15 @@
 }
 
 .medication-modal__close:hover {
-  background-color: rgba(2, 132, 199, 0.08);
+  background-color: #f0f9ff;
   color: #0284c7;
-  transform: rotate(90deg);
 }
 
 .medication-modal__title {
   margin: 0 0 24px;
   font-size: 28px;
   font-weight: 700;
-  background: linear-gradient(135deg, #0284c7 0%, #7dd3fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #0369a1;
   padding-right: 40px;
 }
 
@@ -902,19 +887,17 @@
 }
 
 .confirmation-modal__btn--delete {
-  background: linear-gradient(135deg, #dc2626, #ef4444);
+  background: #dc2626;
   color: white;
 }
 
 .confirmation-modal__btn--delete:hover {
-  background: linear-gradient(135deg, #b91c1c, #dc2626);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+  background: #b91c1c;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
 }
 
 .confirmation-modal__btn--delete:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+  box-shadow: 0 1px 4px rgba(220, 38, 38, 0.3);
 }
 
 @media screen and (max-width: 768px) {
@@ -1299,7 +1282,7 @@
   justify-content: center;
   font-size: 14px;
   line-height: 1;
-  background: linear-gradient(135deg, #0284c7, #7dd3fc);
+  background: #0284c7;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -1310,26 +1293,23 @@
 }
 
 .medication-log__prn-give-btn--inline:hover {
-  background: linear-gradient(135deg, #0369a1, #0284c7);
+  background: #0369a1;
 }
 
 /* PRN / As-Needed Medications Section */
 .medication-log__prn-section {
   margin-top: 32px;
   padding: 24px;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e0f2fe;
 }
 
 .medication-log__prn-title {
   margin: 0 0 20px;
   font-size: 20px;
   font-weight: 700;
-  background: linear-gradient(135deg, #0284c7 0%, #7dd3fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #0369a1;
 }
 
 .medication-log__prn-medications {
@@ -1376,7 +1356,7 @@
 }
 
 .medication-log__prn-directions {
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  background: #eff6ff;
   border-left: 4px solid #0284c7;
   border-radius: 8px;
   padding: 16px;
@@ -1420,7 +1400,7 @@
 
 .medication-log__prn-give-btn {
   padding: 12px;
-  background: linear-gradient(135deg, #0284c7 0%, #7dd3fc 100%);
+  background: #0284c7;
   border: none;
   border-radius: 8px;
   color: white;

@@ -8,15 +8,15 @@
   padding: 0 20px;
   max-width: 1000px;
   margin: 0 auto 0;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid #e0f2fe;
 }
 
 .dashboard__tab {
-  padding: 16px 24px;
+  padding: 14px 24px;
   background: none;
   border: none;
   border-bottom: 3px solid transparent;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   font-family: "Raleway", Arial, sans-serif;
   color: #6b7280;
@@ -28,7 +28,7 @@
 
 .dashboard__tab:hover {
   color: #0284c7;
-  background: #f9fafb;
+  background: #f0f9ff;
 }
 
 .dashboard__tab_active {

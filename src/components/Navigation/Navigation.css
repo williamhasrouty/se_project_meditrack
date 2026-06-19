@@ -75,8 +75,7 @@
 }
 
 .navigation__notifications-btn:hover {
-  background-color: #f3f4f6;
-  transform: scale(1.05);
+  background-color: #f0f9ff;
 }
 
 .navigation__notifications-icon {
@@ -89,7 +88,7 @@
   position: absolute;
   top: 2px;
   right: 2px;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: #ef4444;
   color: white;
   font-size: 10px;
   font-weight: 700;
@@ -98,18 +97,7 @@
   min-width: 18px;
   text-align: center;
   line-height: 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .navigation__link {
@@ -123,12 +111,12 @@
 
 .navigation__link:hover {
   color: #0284c7;
-  background-color: #f3f4f6;
+  background-color: #f0f9ff;
 }
 
 .navigation__link_active {
   color: #0284c7;
-  background-color: #f3f4f6;
+  background-color: #f0f9ff;
 }
 
 .navigation__button {
@@ -146,33 +134,30 @@
 .navigation__button:hover {
   background-color: #0284c7;
   color: #ffffff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navigation__button_type_signup {
-  background: linear-gradient(135deg, #0284c7, #0369a1);
+  background: #0284c7;
   color: #ffffff;
   border: none;
 }
 
 .navigation__button_add-client {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: #10b981;
   color: #ffffff;
   border: none;
   padding: 8px 20px;
 }
 
 .navigation__button_add-client:hover {
-  background: linear-gradient(135deg, #059669, #047857);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+  background: #059669;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
 }
 
 .navigation__button_type_signup:hover {
-  background: linear-gradient(135deg, #0369a1, #0284c7);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  background: #0369a1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navigation__button_logout {
@@ -247,13 +232,13 @@
   }
 
   .navigation__mobile-button_signup {
-    background: linear-gradient(135deg, #0284c7, #0369a1);
+    background: #0284c7;
     color: #ffffff;
     border: none;
   }
 
   .navigation__mobile-button_signup:hover {
-    background: linear-gradient(135deg, #0369a1, #0284c7);
+    background: #0369a1;
   }
 
   .navigation__mobile-button_logout {
