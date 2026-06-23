@@ -12,6 +12,7 @@ function ClientList({
   currentUser,
   onAssignClient,
   onGetStaffUsers,
+  onAddClient,
 }) {
   const [visibleCount, setVisibleCount] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
@@ -131,9 +132,9 @@ function ClientList({
     return regionClasses[region] || "client-list__region--default";
   };
 
-  const handleAssignChange = (clientId, staffId) => {
+  const handleAssignChange = (clientId, staffIds) => {
     if (!onAssignClient) return;
-    onAssignClient(clientId, staffId || null)
+    onAssignClient(clientId, staffIds)
       .then(() => {
         // Success
       })
@@ -176,7 +177,6 @@ function ClientList({
 
   return (
     <section className="client-list">
-      <h2 className="client-list__title">Your Clients</h2>
       <div className="client-list__search-container">
         <input
           type="text"
@@ -188,6 +188,11 @@ function ClientList({
             setVisibleCount(10); // Reset visible count when searching
           }}
         />
+        {isAdmin && onAddClient && (
+          <button className="client-list__add-button" onClick={onAddClient}>
+            + Add Client
+          </button>
+        )}
       </div>
       {filteredClients.length === 0 ? (
         <p className="client-list__empty">No clients match your search</p>
@@ -257,21 +262,64 @@ function ClientList({
                   </Link>
                   {isAdmin && (
                     <div className="client-list__cell client-list__cell--assign">
-                      <select
-                        className="client-list__assign-select"
-                        value={client.assignedTo?._id || ""}
-                        onChange={(e) =>
-                          handleAssignChange(client._id, e.target.value)
-                        }
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <option value="">Unassigned</option>
-                        {staffUsers.map((staff) => (
-                          <option key={staff._id} value={staff._id}>
-                            {staff.name}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="client-list__staff-container">
+                        {!client.assignedStaff ||
+                        client.assignedStaff.length === 0 ? (
+                          <span className="client-list__unassigned">
+                            Unassigned
+                          </span>
+                        ) : (
+                          <div className="client-list__staff-summary">
+                            <span className="client-list__staff-count">
+                              {client.assignedStaff.length} Staff
+                            </span>
+                            <div className="client-list__staff-badges">
+                              {client.assignedStaff.map((staff) => (
+                                <span
+                                  key={staff._id}
+                                  className="client-list__staff-badge"
+                                >
+                                  {staff.name}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        <select
+                          className="client-list__assign-select"
+                          value=""
+                          onChange={(e) => {
+                            const staffId = e.target.value;
+                            if (!staffId) return;
+
+                            const currentStaffIds = (
+                              client.assignedStaff || []
+                            ).map((s) => s._id);
+                            const isAssigned =
+                              currentStaffIds.includes(staffId);
+
+                            const newStaffIds = isAssigned
+                              ? currentStaffIds.filter((id) => id !== staffId)
+                              : [...currentStaffIds, staffId];
+
+                            handleAssignChange(client._id, newStaffIds);
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <option value="">+ Add/Remove Staff</option>
+                          {staffUsers.map((staff) => {
+                            const isAssigned = (
+                              client.assignedStaff || []
+                            ).some((s) => s._id === staff._id);
+                            return (
+                              <option key={staff._id} value={staff._id}>
+                                {isAssigned ? "✓ " : ""}
+                                {staff.name}
+                              </option>
+                            );
+                          })}
+                        </select>
+                      </div>
                     </div>
                   )}
                   {isAdmin && (
@@ -286,7 +334,7 @@ function ClientList({
                       >
                         Edit
                       </button>
-                      <button
+                      {/* <button
                         className="client-list__delete-button"
                         onClick={(e) => {
                           e.preventDefault();
@@ -295,7 +343,7 @@ function ClientList({
                         aria-label="Delete client"
                       >
                         Delete
-                      </button>
+                      </button> */}
                     </div>
                   )}
                 </li>

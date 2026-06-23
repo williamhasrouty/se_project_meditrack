@@ -2,23 +2,64 @@ import { useState, useEffect } from "react";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
 
 function EditClientModal({ onClose, onEditClient, isOpen, client }) {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [region, setRegion] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [allergies, setAllergies] = useState("");
+  const [diagnoses, setDiagnoses] = useState("");
+  const [emergencyContacts, setEmergencyContacts] = useState("");
+  const [prescribingPhysician, setPrescribingPhysician] = useState("");
+  const [pharmacyInfo, setPharmacyInfo] = useState("");
+  const [notes, setNotes] = useState("");
+  const [isActive, setIsActive] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (client) {
-      setName(client.name || "");
+      const nameParts = (client.name || "").split(" ");
+      if (nameParts.length >= 2) {
+        setFirstName(nameParts[0]);
+        setLastName(nameParts.slice(1).join(" "));
+      } else {
+        setFirstName(client.name || "");
+        setLastName("");
+      }
       setRegion(client.region || "");
       setImageUrl(client.imageUrl || "");
+      setDateOfBirth(
+        client.dateOfBirth
+          ? new Date(client.dateOfBirth).toISOString().split("T")[0]
+          : "",
+      );
+      setAllergies(client.allergies || "");
+      setDiagnoses(client.diagnoses || "");
+      setEmergencyContacts(client.emergencyContacts || "");
+      setPrescribingPhysician(client.prescribingPhysician || "");
+      setPharmacyInfo(client.pharmacyInfo || "");
+      setNotes(client.notes || "");
+      setIsActive(client.isActive !== undefined ? client.isActive : true);
     }
   }, [client]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
-    onEditClient({ name, region, imageUrl })
+    const name = `${firstName} ${lastName}`.trim();
+    onEditClient({
+      name,
+      region,
+      imageUrl,
+      dateOfBirth,
+      allergies,
+      diagnoses,
+      emergencyContacts,
+      prescribingPhysician,
+      pharmacyInfo,
+      notes,
+      isActive,
+    })
       .then(() => {
         onClose();
       })
@@ -37,19 +78,34 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={handleSubmit}
+      modalSize="wide"
     >
       <label className="modal__label">
-        Client Name
+        First Name
         <input
           type="text"
           className="modal__input"
-          name="name"
-          placeholder="Enter client name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          name="firstName"
+          placeholder="Enter first name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
           required
           minLength={2}
-          maxLength={50}
+          maxLength={30}
+        />
+      </label>
+      <label className="modal__label">
+        Last Name
+        <input
+          type="text"
+          className="modal__input"
+          name="lastName"
+          placeholder="Enter last name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+          minLength={2}
+          maxLength={30}
         />
       </label>
       <label className="modal__label">
@@ -70,7 +126,18 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
         </select>
       </label>
       <label className="modal__label">
-        Photo URL (optional)
+        Date of Birth
+        <input
+          type="date"
+          className="modal__input"
+          name="dateOfBirth"
+          value={dateOfBirth}
+          onChange={(e) => setDateOfBirth(e.target.value)}
+          required
+        />
+      </label>
+      <label className="modal__label">
+        Photo URL
         <input
           type="url"
           className="modal__input"
@@ -79,6 +146,86 @@ function EditClientModal({ onClose, onEditClient, isOpen, client }) {
           value={imageUrl}
           onChange={(e) => setImageUrl(e.target.value)}
         />
+      </label>
+
+      <label className="modal__label">
+        Allergies
+        <textarea
+          className="modal__input modal__input--textarea"
+          name="allergies"
+          placeholder="Enter known allergies"
+          value={allergies}
+          onChange={(e) => setAllergies(e.target.value)}
+          rows={2}
+        />
+      </label>
+      <label className="modal__label">
+        Diagnoses / Conditions
+        <textarea
+          className="modal__input modal__input--textarea"
+          name="diagnoses"
+          placeholder="Enter diagnoses or conditions"
+          value={diagnoses}
+          onChange={(e) => setDiagnoses(e.target.value)}
+          rows={2}
+        />
+      </label>
+      <label className="modal__label">
+        Emergency Contacts
+        <textarea
+          className="modal__input modal__input--textarea"
+          name="emergencyContacts"
+          placeholder="Enter emergency contact information"
+          value={emergencyContacts}
+          onChange={(e) => setEmergencyContacts(e.target.value)}
+          rows={2}
+        />
+      </label>
+      <label className="modal__label">
+        Prescribing Physician
+        <input
+          type="text"
+          className="modal__input"
+          name="prescribingPhysician"
+          placeholder="Enter physician name and contact"
+          value={prescribingPhysician}
+          onChange={(e) => setPrescribingPhysician(e.target.value)}
+        />
+      </label>
+      <label className="modal__label">
+        Pharmacy Information
+        <input
+          type="text"
+          className="modal__input"
+          name="pharmacyInfo"
+          placeholder="Enter pharmacy name and contact"
+          value={pharmacyInfo}
+          onChange={(e) => setPharmacyInfo(e.target.value)}
+        />
+      </label>
+      <label className="modal__label">
+        Notes
+        <textarea
+          className="modal__input modal__input--textarea"
+          name="notes"
+          placeholder="Enter any additional notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          rows={3}
+        />
+      </label>
+      <label className="modal__label">
+        Client Status
+        <select
+          className="modal__input"
+          name="isActive"
+          value={isActive ? "active" : "inactive"}
+          onChange={(e) => setIsActive(e.target.value === "active")}
+          required
+        >
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
       </label>
     </ModalWithForm>
   );

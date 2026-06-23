@@ -2,14 +2,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px 48px;
+  padding: 20px 48px;
   background-color: #ffffff;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e0f2fe;
   position: sticky;
   top: 0;
   z-index: 100;
-  backdrop-filter: blur(10px);
   font-family: "Raleway", Arial, sans-serif;
 }
 
@@ -20,25 +19,22 @@
 }
 
 .header__logo {
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 700;
-  background: linear-gradient(135deg, #0284c7, #7dd3fc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #0284c7;
   cursor: pointer;
-  transition: transform 150ms ease-in-out;
+  transition: color 150ms ease-in-out;
   text-decoration: none;
 }
 
 .header__logo:hover {
-  transform: scale(1.05);
+  color: #0369a1;
 }
 
 .header__datetime {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
-  color: #6b7280;
+  color: #0284c7;
   white-space: nowrap;
 }
 

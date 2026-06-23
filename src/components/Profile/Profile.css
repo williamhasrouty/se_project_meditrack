@@ -38,9 +38,9 @@
 }
 
 .profile__stat-card {
-  background: linear-gradient(135deg, #ffffff, #f8f9ff);
-  border: 2px solid #e5e7eb;
-  border-radius: 16px;
+  background: #ffffff;
+  border: 2px solid #e0f2fe;
+  border-radius: 12px;
   padding: 24px;
   text-align: center;
   transition: all 200ms ease-in-out;
@@ -48,18 +48,14 @@
 
 .profile__stat-card:hover {
   border-color: #0284c7;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.15);
 }
 
 .profile__stat-number {
   margin: 0 0 8px;
   font-size: 48px;
   font-weight: 700;
-  background: linear-gradient(135deg, #0284c7, #7dd3fc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #0284c7;
 }
 
 .profile__stat-label {
@@ -93,14 +89,14 @@
 
 .profile__client-item {
   background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border: 1px solid #e0f2fe;
+  border-radius: 10px;
   transition: all 200ms ease-in-out;
 }
 
 .profile__client-item:hover {
   border-color: #0284c7;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .profile__client-link {
@@ -117,7 +113,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0284c7, #7dd3fc);
+  background: #0284c7;
   color: #ffffff;
   display: flex;
   align-items: center;

@@ -142,14 +142,19 @@ function getMedicationAdministrations(clientId, month, year, token) {
 }
 
 // Assign client to staff (admin only)
-function assignClient(clientId, staffId, token) {
+function assignClient(clientId, staffIds, token) {
+  // Support both single ID (string) and multiple IDs (array)
+  const body = Array.isArray(staffIds)
+    ? { staffIds: staffIds }
+    : { staffId: staffIds || null };
+
   return fetch(`${BASE_URL}/clients/${clientId}/assign`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ staffId: staffId || null }),
+    body: JSON.stringify(body),
   }).then(handleResponse);
 }
 
@@ -157,6 +162,40 @@ function assignClient(clientId, staffId, token) {
 function getStaffUsers(token) {
   return fetch(`${BASE_URL}/users/staff`, {
     method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(handleResponse);
+}
+
+// Get PRN administrations for a client
+function getPRNAdministrations(clientId, token) {
+  return fetch(`${BASE_URL}/prn-administrations/${clientId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(handleResponse);
+}
+
+// Create a PRN administration
+function createPRNAdministration(data, token) {
+  return fetch(`${BASE_URL}/prn-administrations`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  }).then(handleResponse);
+}
+
+// Delete a PRN administration
+function deletePRNAdministration(id, token) {
+  return fetch(`${BASE_URL}/prn-administrations/${id}`, {
+    method: "DELETE",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
@@ -177,4 +216,7 @@ export {
   getMedicationAdministrations,
   assignClient,
   getStaffUsers,
+  getPRNAdministrations,
+  createPRNAdministration,
+  deletePRNAdministration,
 };
