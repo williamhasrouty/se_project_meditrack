@@ -61,31 +61,6 @@ function AddMedicationModal({ onClose, onAddMedication, isOpen }) {
           required
         />
       </label>
-      <label className="modal__label modal__label--checkbox">
-        <input
-          type="checkbox"
-          className="modal__checkbox"
-          checked={isPRN}
-          onChange={(e) => setIsPRN(e.target.checked)}
-        />
-        <span>PRN / As-Needed Medication</span>
-      </label>
-      {isPRN && (
-        <label className="modal__label">
-          Directions / Instructions
-          <textarea
-            className="modal__input modal__input--textarea"
-            placeholder="e.g., Give for pain level 5+, Max 3 doses in 24 hours"
-            value={directions}
-            onChange={(e) => setDirections(e.target.value)}
-            maxLength={500}
-            rows={2}
-          />
-          <span className="modal__hint">
-            Add any special instructions or directions for this PRN medication
-          </span>
-        </label>
-      )}
       {!isPRN && (
         <label className="modal__label">
           Administration Times *
@@ -102,11 +77,36 @@ function AddMedicationModal({ onClose, onAddMedication, isOpen }) {
           </span>
         </label>
       )}
+      <label className="modal__label modal__label--checkbox">
+        <input
+          type="checkbox"
+          className="modal__checkbox"
+          checked={isPRN}
+          onChange={(e) => setIsPRN(e.target.checked)}
+        />
+        <span>PRN / As-Needed Medication</span>
+      </label>
       {isPRN && (
-        <p className="modal__hint">
-          PRN medications are given as needed and do not require scheduled
-          times.
-        </p>
+        <>
+          <p className="modal__hint">
+            PRN medications are given as needed and do not require scheduled
+            times.
+          </p>
+          <label className="modal__label">
+            Directions / Instructions
+            <textarea
+              className="modal__input modal__input--textarea"
+              placeholder="e.g., Give for pain level 5+, Max 3 doses in 24 hours"
+              value={directions}
+              onChange={(e) => setDirections(e.target.value)}
+              maxLength={500}
+              rows={2}
+            />
+            <span className="modal__hint">
+              Add any special instructions or directions for this PRN medication
+            </span>
+          </label>
+        </>
       )}
     </ModalWithForm>
   );
