@@ -1166,18 +1166,22 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   border-bottom: 2px solid;
+  border: none;
 }
 
 .medication-log__time-separator-cell--am {
   color: #0369a1;
   border-bottom-color: #7dd3fc;
   border-top: none;
+  background-color:  #0369a127;
 }
 
 .medication-log__time-separator-cell--pm {
   color: #7c3aed;
   border-bottom-color: #c4b5fd;
-  border-top: 24px solid transparent;
+  background-color:  #7c3aed27;
+
+
 }
 
 /* PRN separator row inside the MAR table */
