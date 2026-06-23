@@ -468,6 +468,23 @@ function MedicationLog({
     client?.medications?.filter((med) => !med.isPRN) || [];
   const prnMedications = client?.medications?.filter((med) => med.isPRN) || [];
 
+  // Helper to determine if a time string is AM
+  const isAMTime = (time) => {
+    const upper = time.toUpperCase();
+    if (upper.includes("AM")) return true;
+    if (upper.includes("PM")) return false;
+    const hour = parseInt(time.split(":")[0], 10);
+    return hour < 12;
+  };
+
+  const amScheduledMeds = scheduledMedications
+    .map((med) => ({ ...med, times: med.times.filter(isAMTime) }))
+    .filter((med) => med.times.length > 0);
+
+  const pmScheduledMeds = scheduledMedications
+    .map((med) => ({ ...med, times: med.times.filter((t) => !isAMTime(t)) }))
+    .filter((med) => med.times.length > 0);
+
   // PDF Download function
   const handleDownloadPDF = () => {
     const doc = new jsPDF({ orientation: "landscape" });
@@ -897,10 +914,93 @@ function MedicationLog({
             </tr>
           </thead>
           <tbody>
-            {scheduledMedications.map((medication) =>
+            {amScheduledMeds.length > 0 && (
+              <tr className="medication-log__time-separator-row">
+                <td
+                  colSpan={daysInMonth + 2}
+                  className="medication-log__time-separator-cell medication-log__time-separator-cell--am"
+                >
+                  AM — Morning
+                </td>
+              </tr>
+            )}
+            {amScheduledMeds.map((medication) =>
               medication.times.map((time, timeIndex) => (
                 <tr
-                  key={`${medication._id}-${time}`}
+                  key={`${medication._id}-${time}-am`}
+                  className="medication-log__row"
+                >
+                  {timeIndex === 0 && (
+                    <td
+                      className="medication-log__medication-cell medication-log__medication-cell_clickable"
+                      rowSpan={medication.times.length}
+                      onClick={() => handleMedicationClick(medication)}
+                    >
+                      <div className="medication-log__medication-content">
+                        <span className="medication-log__medication-name">
+                          {medication.name}
+                        </span>
+                        {isAdmin && (
+                          <button
+                            className="medication-log__edit-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditMedicationModal(medication);
+                            }}
+                            aria-label="Edit medication"
+                          >
+                            Edit
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  )}
+                  <td className="medication-log__time-cell">{time}</td>
+                  {Array.from({ length: daysInMonth }, (_, i) => {
+                    const day = i + 1;
+                    const key = `${medication._id}-${day}-${time}`;
+                    const cellValue = administrations[key] || "";
+                    const staffName = cellValue && initialsToName[cellValue];
+                    return (
+                      <td
+                        key={day}
+                        className="medication-log__td medication-log__td_cell"
+                        onClick={() =>
+                          handleCellClick(medication._id, day, time)
+                        }
+                      >
+                        {cellValue && (
+                          <div className="medication-log__cell-content">
+                            <span className="medication-log__cell-initials">
+                              {cellValue}
+                            </span>
+                            {staffName && currentUser?.role === "admin" && (
+                              <div className="medication-log__cell-tooltip">
+                                {staffName}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              )),
+            )}
+            {pmScheduledMeds.length > 0 && (
+              <tr className="medication-log__time-separator-row">
+                <td
+                  colSpan={daysInMonth + 2}
+                  className="medication-log__time-separator-cell medication-log__time-separator-cell--pm"
+                >
+                  PM — Evening
+                </td>
+              </tr>
+            )}
+            {pmScheduledMeds.map((medication) =>
+              medication.times.map((time, timeIndex) => (
+                <tr
+                  key={`${medication._id}-${time}-pm`}
                   className="medication-log__row"
                 >
                   {timeIndex === 0 && (

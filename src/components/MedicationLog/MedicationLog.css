@@ -1154,6 +1154,32 @@
   }
 }
 
+/* AM / PM separator rows inside the MAR table */
+.medication-log__time-separator-row {
+  background-color: transparent;
+}
+
+.medication-log__time-separator-cell {
+  padding: 14px 10px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 2px solid;
+}
+
+.medication-log__time-separator-cell--am {
+  color: #0369a1;
+  border-bottom-color: #7dd3fc;
+  border-top: none;
+}
+
+.medication-log__time-separator-cell--pm {
+  color: #7c3aed;
+  border-bottom-color: #c4b5fd;
+  border-top: 24px solid transparent;
+}
+
 /* PRN separator row inside the MAR table */
 .medication-log__prn-separator-row {
   background-color: #f0f9ff;
